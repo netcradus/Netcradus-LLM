@@ -4,6 +4,24 @@ Netcradus LLM is a modular, high-performance Transformer architecture built for 
 
 ---
 
+## 🌐 ChatGPT Web Interface
+
+Launch a production-grade, dark-mode ChatGPT-style web UI to interact with Netcradus LLM in real-time.
+
+```bash
+python web_server.py --port 8000
+```
+Open **[http://localhost:8000](http://localhost:8000)** in your web browser.
+
+### 🌟 Web UI Features
+- **ChatGPT Layout**: Collapsible sidebar, prompt suggestions hero section, conversation history management, and clear chat.
+- **Rich Aesthetics**: Dark glassmorphism interface (`#090d16`, `#101726`, `#8b5cf6`, `#06b6d4`), Inter & JetBrains Mono typography, pulse typing animations.
+- **Model Parameters Control**: Dynamic sliders for Temperature (0.1–1.5) and Max Tokens (16–512).
+- **Code Block Formatting**: Markdown syntax highlighting with one-click "Copy Code" button.
+- **Zero External Dependencies**: Built with Vanilla HTML/CSS/JS and native Python HTTP server.
+
+---
+
 ## 🚀 Phase 4 – Tokenizer Design & Training
 
 Phase 4 delivers a production-quality, byte-level Byte Pair Encoding (BPE) tokenizer training pipeline built completely from scratch using the HuggingFace `tokenizers` engine and custom modular utilities.
@@ -26,6 +44,13 @@ Phase 4 delivers a production-quality, byte-level Byte Pair Encoding (BPE) token
 
 ```
 Netcradus-LLM/
+│
+├── web/                      # ChatGPT Web Interface
+│   ├── index.html            # ChatGPT-style web layout & HTML markup
+│   ├── styles.css            # Dark glassmorphism CSS design system
+│   └── app.js                # Frontend JS app logic & Markdown renderer
+│
+├── web_server.py             # Multi-threaded HTTP backend API server
 │
 ├── tokenizer/
 │   ├── train_tokenizer.py    # Training pipeline with BPEContainerTrainer & streaming iterator
@@ -53,14 +78,19 @@ Netcradus-LLM/
 
 ## 🛠️ Usage Guide
 
-### 1. Training the Tokenizer
+### 1. Launching the ChatGPT Web Interface
+```bash
+python web_server.py --port 8000
+```
+
+### 2. Training the Tokenizer
 To train the tokenizer on your custom text corpus (`data/processed/cleaned_corpus.txt`):
 
 ```bash
 python tokenizer/train_tokenizer.py
 ```
 
-### 2. Encoding and Decoding in Python
+### 3. Encoding and Decoding in Python
 
 ```python
 from tokenizer import NetcradusTokenizerWrapper
@@ -72,34 +102,22 @@ tokenizer = NetcradusTokenizerWrapper.load("tokenizer_model")
 text = "Artificial intelligence and deep learning."
 tokens = tokenizer.encode(text, add_special_tokens=True)
 print("Token IDs:", tokens)
-# Output: [1, 1768, 648, 276, 2724, 767, 2144, 18, 2]
 
 # Decode token IDs back to text
 decoded = tokenizer.decode(tokens, skip_special_tokens=True)
 print("Decoded Text:", decoded)
-# Output: 'Artificial intelligence and deep learning.'
-
-# Batch Operations
-texts = ["Hello Netcradus!", "Transformer architecture."]
-batch_ids = tokenizer.batch_encode(texts, add_special_tokens=True)
-batch_texts = tokenizer.batch_decode(batch_ids, skip_special_tokens=True)
 ```
 
 ---
 
 ## 🧪 Testing & Verification
 
-Run the comprehensive 7-stage test suite:
+Run the comprehensive test suites:
 
 ```bash
+# Tokenizer Test Suite
 python tokenizer/tokenizer_test.py
-```
 
-### Test Coverage:
-1. **Basic Encoding & Decoding**: Exact string roundtrip verification.
-2. **Special Tokens**: `<BOS>`, `<EOS>`, `<PAD>`, and `<MASK>` injection and recognition.
-3. **Unknown Words & OOV**: Byte-level fallback subword resolution.
-4. **Multilingual & Unicode**: Preservation of Emojis, CJK, Devanagari, and mathematical symbols.
-5. **Long Documents**: Large document paragraph compression stress testing.
-6. **Edge Cases**: Empty strings `""` and empty sequence handling.
-7. **Serialization**: Save and load roundtrip consistency across filesystem locations.
+# End-to-End LLM Architecture Test Suite
+python test_suite.py
+```

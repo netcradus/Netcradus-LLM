@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Netcradus LLM Professional ChatGPT & Gemini Style Web Application">
+  <title>Netcradus LLM - ChatGPT & Gemini Interface</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <!-- Design Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <div class="app-container">
+
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-header">
+        <div class="brand">
+          <div class="brand-icon">N</div>
+          <span class="brand-title">Netcradus LLM</span>
+        </div>
+      </div>
+
+      <button class="btn-new-chat" id="btn-new-chat">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>
+        New Chat
+      </button>
+
+      <!-- Persona Modes -->
+      <div class="persona-section">
+        <div class="section-title">Persona Mode</div>
+        <div class="persona-grid">
+          <button class="persona-btn active" data-persona="general">💬 General</button>
+          <button class="persona-btn" data-persona="code">💻 Code</button>
+          <button class="persona-btn" data-persona="reasoning">🧠 Reason</button>
+          <button class="persona-btn" data-persona="creative">🎨 Creative</button>
+        </div>
+      </div>
+
+      <!-- History List -->
+      <div class="section-title" style="padding: 0 16px 4px;">Recent Chats</div>
+      <div class="history-list" id="history-list">
+        <!-- Sessions populated dynamically -->
+      </div>
+
+      <!-- Sidebar Settings -->
+      <div class="sidebar-settings">
+        <div class="setting-group">
+          <div class="setting-label">
+            <span>Temperature</span>
+            <span id="temp-val">0.7</span>
+          </div>
+          <input type="range" class="setting-slider" id="temp-slider" min="0.1" max="1.5" step="0.1" value="0.7">
+        </div>
+
+        <div class="setting-group">
+          <div class="setting-label">
+            <span>Max Tokens</span>
+            <span id="tokens-val">128</span>
+          </div>
+          <input type="range" class="setting-slider" id="tokens-slider" min="16" max="512" step="16" value="128">
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Viewport -->
+    <main class="main-viewport">
+
+      <!-- Header Bar -->
+      <header class="top-header">
+        <div class="header-left">
+          <span class="model-badge">Netcradus-BPE-32k</span>
+          <span class="persona-badge" id="active-persona-badge">General Mode</span>
+          <div class="status-indicator">
+            <span class="dot-online"></span>
+            <span>Online</span>
+          </div>
+        </div>
+
+        <div class="header-right" style="display: flex; gap: 8px;">
+          <button class="btn-new-chat" id="btn-clear-chat" style="margin: 0; padding: 6px 12px; font-size: 0.8rem;">
+            Clear Chat
+          </button>
+        </div>
+      </header>
+
+      <!-- Chat Messages Container -->
+      <section class="messages-container" id="messages-container">
+        <div class="messages-wrapper" id="messages-wrapper">
+
+          <!-- Hero Section (Shown on empty chat) -->
+          <div class="hero-section" id="hero-section">
+            <h1 class="hero-title">Netcradus LLM</h1>
+            <p class="hero-subtitle">Production foundation language model with 32k BPE & SwiGLU GQA architecture.</p>
+
+            <div class="suggestions-grid">
+              <div class="suggestion-card" data-prompt="What makes the Netcradus BPE Tokenizer unique?">
+                <h4>🔤 BPE Tokenizer Specs</h4>
+                <p>Explain 32k vocabulary and special token placement.</p>
+              </div>
+
+              <div class="suggestion-card" data-prompt="Write a Python class to compute Grouped-Query Attention (GQA).">
+                <h4>💻 Python Code Example</h4>
+                <p>Generate multi-head attention code snippet.</p>
+              </div>
+
+              <div class="suggestion-card" data-prompt="How does SwiGLU activation function work in Transformer LLMs?">
+                <h4>🧠 LLM Architecture</h4>
+                <p>Describe SwiGLU vs standard ReLU/GELU.</p>
+              </div>
+
+              <div class="suggestion-card" data-prompt="Describe the training data preprocessing pipeline.">
+                <h4>📊 Data Preprocessing</h4>
+                <p>Detail corpus cleaning and NFKC unicode normalization.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Input Bar -->
+      <footer class="input-container">
+        <div class="input-box-wrapper">
+          <textarea class="chat-input" id="chat-input" placeholder="Ask Netcradus LLM anything..." rows="1"></textarea>
+          <div class="input-actions">
+            <button class="btn-stop" id="btn-stop" title="Stop Generation" style="display: none;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="16" height="16" rx="2"/></svg>
+            </button>
+            <button class="btn-send" id="btn-send" title="Send Message">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            </button>
+          </div>
+        </div>
+      </footer>
+
+    </main>
+
+  </div>
+
+  <!-- Application Logic -->
+  <script src="app.js"></script>
+</body>
+</html>
