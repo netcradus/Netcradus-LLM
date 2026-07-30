@@ -1,0 +1,31 @@
+{
+  "vocab_size": 32000,
+  "min_frequency": 2,
+  "pad_token": "<PAD>",
+  "bos_token": "<BOS>",
+  "eos_token": "<EOS>",
+  "unk_token": "<UNK>",
+  "mask_token": "<MASK>",
+  "add_prefix_space": false,
+  "lowercase": false,
+  "unicode_normalizer": "NFKC",
+  "corpus_path": "data/processed/cleaned_corpus.txt",
+  "output_dir": "tokenizer_model",
+  "algorithm": "Byte-Pair Encoding (BPE)",
+  "model_type": "BPE",
+  "version": "1.0.0",
+  "special_tokens": [
+    "<PAD>",
+    "<BOS>",
+    "<EOS>",
+    "<UNK>",
+    "<MASK>"
+  ],
+  "special_tokens_dict": {
+    "<PAD>": 0,
+    "<BOS>": 1,
+    "<EOS>": 2,
+    "<UNK>": 3,
+    "<MASK>": 4
+  }
+}

@@ -1,0 +1,28 @@
+# Python Caches
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Model Checkpoints & Large Binary Weights
+checkpoints_demo/
+tmp_checkpoint_test/
+*.pt
+*.pth
+*.bin
+*.onnx
+*.safetensors
+*.ckpt
+
+# Environment & IDE
+.env
+.venv/
+venv/
+ENV/
+.vscode/
+.idea/
+
+# OS Specific
+.DS_Store
+Thumbs.db
