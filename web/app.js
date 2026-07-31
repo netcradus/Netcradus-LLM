@@ -4,27 +4,52 @@
 
 document.addEventListener('DOMContentLoaded', () => {
   // DOM Elements
+  const appContainer = document.getElementById('app-container');
   const chatInput = document.getElementById('chat-input');
   const btnSend = document.getElementById('btn-send');
   const btnStop = document.getElementById('btn-stop');
   const messagesWrapper = document.getElementById('messages-wrapper');
   const messagesContainer = document.getElementById('messages-container');
   const heroSection = document.getElementById('hero-section');
+  const bottomInputContainer = document.getElementById('bottom-input-container');
   const btnNewChat = document.getElementById('btn-new-chat');
   const btnClearChat = document.getElementById('btn-clear-chat');
   const historyList = document.getElementById('history-list');
-  const suggestionCards = document.querySelectorAll('.suggestion-card');
-  const personaBtns = document.querySelectorAll('.persona-btn');
-  const activePersonaBadge = document.getElementById('active-persona-badge');
+  const modelSelector = document.getElementById('model-selector');
+  const modalModelSelect = document.getElementById('modal-model-select');
+  const btnThemeToggle = document.getElementById('btn-theme-toggle');
+  const themeIcon = document.getElementById('theme-icon');
+  const themeText = document.getElementById('theme-text');
 
-  // Sliders
-  const tempSlider = document.getElementById('temp-slider');
-  const tempVal = document.getElementById('temp-val');
-  const tokensSlider = document.getElementById('tokens-slider');
-  const tokensVal = document.getElementById('tokens-val');
+  // Hero Card Input Elements
+  const heroChatInput = document.getElementById('hero-chat-input');
+  const btnHeroSend = document.getElementById('btn-hero-send');
+  const btnHeroAttach = document.getElementById('btn-hero-attach');
+  const heroCategorySelect = document.getElementById('hero-category-select');
+
+  // Sidebar Toggles & Input Tools
+  const btnSidebarCollapse = document.getElementById('btn-sidebar-collapse');
+  const btnSidebarExpand = document.getElementById('btn-sidebar-expand');
+  const btnAttach = document.getElementById('btn-attach');
+  const btnMic = document.getElementById('btn-mic');
+  const fileUploadInput = document.getElementById('file-upload-input');
+
+  // Profile Options & Clear History Elements
+  const userProfileTrigger = document.getElementById('user-profile-trigger');
+  const headerAvatarTrigger = document.getElementById('header-avatar-trigger');
+  const btnSettings = document.getElementById('btn-settings');
+  const profileMenuDropdown = document.getElementById('profile-menu-dropdown');
+  const btnMenuSettings = document.getElementById('btn-menu-settings');
+  const btnMenuClearHistory = document.getElementById('btn-menu-clear-history');
+  const btnSidebarClearHistory = document.getElementById('btn-sidebar-clear-history');
+  const btnModalClearHistory = document.getElementById('btn-modal-clear-history');
+  const settingsModalBackdrop = document.getElementById('settings-modal-backdrop');
+  const btnCloseModal = document.getElementById('btn-close-modal');
 
   // State Management
   let currentPersona = 'general';
+  let selectedModel = 'netcradus-1.0-pro';
+  let currentTheme = localStorage.getItem('netcradus_theme') || 'light';
   let isGenerating = false;
   let abortController = null;
   let sessions = loadSessionsFromStorage();
@@ -32,63 +57,197 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initialize UI
   renderHistoryList();
-  updatePersonaBadge();
+  applyTheme(currentTheme);
 
-  // Sliders
-  tempSlider.addEventListener('input', (e) => {
-    tempVal.textContent = parseFloat(e.target.value).toFixed(1);
-  });
-  tokensSlider.addEventListener('input', (e) => {
-    tokensVal.textContent = e.target.value;
-  });
+  // Profile Options Dropdown Toggle
+  const toggleProfileMenu = (e) => {
+    e.stopPropagation();
+    if (profileMenuDropdown) {
+      const isShown = profileMenuDropdown.style.display === 'block';
+      profileMenuDropdown.style.display = isShown ? 'none' : 'block';
+    }
+  };
 
-  // Persona Buttons
-  personaBtns.forEach((btn) => {
-    btn.addEventListener('click', () => {
-      personaBtns.forEach((b) => b.classList.remove('active'));
-      btn.classList.add('active');
-      currentPersona = btn.getAttribute('data-persona') || 'general';
-      updatePersonaBadge();
-    });
-  });
+  if (userProfileTrigger) userProfileTrigger.addEventListener('click', toggleProfileMenu);
+  if (headerAvatarTrigger) headerAvatarTrigger.addEventListener('click', toggleProfileMenu);
+  if (btnSettings) btnSettings.addEventListener('click', toggleProfileMenu);
 
-  function updatePersonaBadge() {
-    const names = {
-      general: 'General Mode',
-      code: 'Coding Expert Mode',
-      reasoning: 'Deep Reasoning Mode',
-      creative: 'Creative Mode'
-    };
-    activePersonaBadge.textContent = names[currentPersona] || 'General Mode';
-  }
-
-  // Textarea Auto-expand
-  chatInput.addEventListener('input', () => {
-    chatInput.style.height = 'auto';
-    chatInput.style.height = Math.min(chatInput.scrollHeight, 180) + 'px';
-  });
-
-  chatInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      sendMessage();
+  document.addEventListener('click', (e) => {
+    if (profileMenuDropdown && !profileMenuDropdown.contains(e.target) && !e.target.closest('#user-profile-trigger') && !e.target.closest('#header-avatar-trigger')) {
+      profileMenuDropdown.style.display = 'none';
     }
   });
 
-  btnSend.addEventListener('click', () => sendMessage());
-  btnStop.addEventListener('click', stopGeneration);
-  btnNewChat.addEventListener('click', () => startNewSession());
-  btnClearChat.addEventListener('click', () => clearCurrentSession());
+  // Settings Modal Controls
+  if (btnMenuSettings) {
+    btnMenuSettings.addEventListener('click', () => {
+      if (profileMenuDropdown) profileMenuDropdown.style.display = 'none';
+      if (settingsModalBackdrop) settingsModalBackdrop.style.display = 'flex';
+    });
+  }
 
-  suggestionCards.forEach((card) => {
-    card.addEventListener('click', () => {
-      const prompt = card.getAttribute('data-prompt');
-      if (prompt) {
-        chatInput.value = prompt;
+  if (btnCloseModal) {
+    btnCloseModal.addEventListener('click', () => {
+      if (settingsModalBackdrop) settingsModalBackdrop.style.display = 'none';
+    });
+  }
+
+  if (settingsModalBackdrop) {
+    settingsModalBackdrop.addEventListener('click', (e) => {
+      if (e.target === settingsModalBackdrop) {
+        settingsModalBackdrop.style.display = 'none';
+      }
+    });
+  }
+
+  // Clear History Actions
+  const handleClearHistory = () => {
+    clearAllHistory();
+  };
+
+  if (btnMenuClearHistory) btnMenuClearHistory.addEventListener('click', handleClearHistory);
+  if (btnSidebarClearHistory) btnSidebarClearHistory.addEventListener('click', handleClearHistory);
+  if (btnModalClearHistory) btnModalClearHistory.addEventListener('click', handleClearHistory);
+
+  function clearAllHistory() {
+    if (confirm('Are you sure you want to clear all chat history?')) {
+      sessions = {};
+      saveSessionsToStorage();
+      startNewSession();
+      if (profileMenuDropdown) profileMenuDropdown.style.display = 'none';
+      if (settingsModalBackdrop) settingsModalBackdrop.style.display = 'none';
+    }
+  }
+
+  // Theme Toggle Listener
+  if (btnThemeToggle) {
+    btnThemeToggle.addEventListener('click', () => {
+      currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+      applyTheme(currentTheme);
+      localStorage.setItem('netcradus_theme', currentTheme);
+    });
+  }
+
+  function applyTheme(theme) {
+    if (theme === 'light') {
+      document.documentElement.setAttribute('data-theme', 'light');
+      if (themeIcon) themeIcon.textContent = '🌙';
+      if (themeText) themeText.textContent = 'Dark';
+    } else {
+      document.documentElement.setAttribute('data-theme', 'dark');
+      if (themeIcon) themeIcon.textContent = '☀️';
+      if (themeText) themeText.textContent = 'Light';
+    }
+  }
+
+  // Model Selector
+  if (modelSelector) {
+    modelSelector.addEventListener('change', (e) => {
+      selectedModel = e.target.value;
+      if (modalModelSelect) modalModelSelect.value = selectedModel;
+    });
+  }
+
+  if (modalModelSelect) {
+    modalModelSelect.addEventListener('change', (e) => {
+      selectedModel = e.target.value;
+      if (modelSelector) modelSelector.value = selectedModel;
+    });
+  }
+
+  // Hero Category Selector
+  if (heroCategorySelect) {
+    heroCategorySelect.addEventListener('change', (e) => {
+      const cat = e.target.value;
+      if (cat === 'code') currentPersona = 'code';
+      else if (cat === 'cybersecurity' || cat === 'threats') currentPersona = 'reasoning';
+      else currentPersona = 'general';
+    });
+  }
+
+  // Sidebar Collapse / Expand
+  if (btnSidebarCollapse && btnSidebarExpand) {
+    btnSidebarCollapse.addEventListener('click', () => {
+      appContainer.classList.add('sidebar-collapsed');
+      btnSidebarExpand.style.display = 'flex';
+    });
+
+    btnSidebarExpand.addEventListener('click', () => {
+      appContainer.classList.remove('sidebar-collapsed');
+      btnSidebarExpand.style.display = 'none';
+    });
+  }
+
+  // Attachment & Voice Simulator
+  const handleAttachClick = () => { if (fileUploadInput) fileUploadInput.click(); };
+  if (btnAttach) btnAttach.addEventListener('click', handleAttachClick);
+  if (btnHeroAttach) btnHeroAttach.addEventListener('click', handleAttachClick);
+
+  if (fileUploadInput) {
+    fileUploadInput.addEventListener('change', (e) => {
+      if (e.target.files.length > 0) {
+        const filename = e.target.files[0].name;
+        if (heroChatInput) heroChatInput.value += ` [Attached: ${filename}] `;
+        if (chatInput) chatInput.value += ` [Attached: ${filename}] `;
+      }
+    });
+  }
+
+  if (btnMic) {
+    btnMic.addEventListener('click', () => {
+      btnMic.classList.toggle('active-mic');
+      if (btnMic.classList.contains('active-mic')) {
+        chatInput.placeholder = "Listening... Speak your prompt...";
+      } else {
+        chatInput.placeholder = "Ask Netcradus LLM anything...";
+      }
+    });
+  }
+
+  // Textarea Listeners
+  if (chatInput) {
+    chatInput.addEventListener('input', () => {
+      chatInput.style.height = 'auto';
+      chatInput.style.height = Math.min(chatInput.scrollHeight, 180) + 'px';
+    });
+
+    chatInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
         sendMessage();
       }
     });
-  });
+  }
+
+  if (heroChatInput) {
+    heroChatInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        const text = heroChatInput.value.trim();
+        if (text) {
+          heroChatInput.value = '';
+          sendMessage(text);
+        }
+      }
+    });
+  }
+
+  if (btnHeroSend) {
+    btnHeroSend.addEventListener('click', () => {
+      if (heroChatInput) {
+        const text = heroChatInput.value.trim();
+        if (text) {
+          heroChatInput.value = '';
+          sendMessage(text);
+        }
+      }
+    });
+  }
+
+  if (btnSend) btnSend.addEventListener('click', () => sendMessage());
+  if (btnStop) btnStop.addEventListener('click', stopGeneration);
+  if (btnNewChat) btnNewChat.addEventListener('click', () => startNewSession());
+  if (btnClearChat) btnClearChat.addEventListener('click', () => clearCurrentSession());
 
   // Session Storage Helpers
   function loadSessionsFromStorage() {
@@ -145,6 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const item = document.createElement('div');
       item.className = `history-item ${sess.id === currentSessionId ? 'active' : ''}`;
       item.innerHTML = `
+        <svg class="history-item-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
         <span class="history-item-title">${escapeHtml(sess.title)}</span>
         <div class="history-item-actions">
           <button class="icon-btn btn-del" title="Delete Session">🗑</button>
@@ -188,19 +348,21 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!sess || sess.messages.length === 0) {
       messagesWrapper.appendChild(heroSection);
       heroSection.style.display = 'block';
+      if (bottomInputContainer) bottomInputContainer.style.display = 'none';
       return;
     }
 
     heroSection.style.display = 'none';
+    if (bottomInputContainer) bottomInputContainer.style.display = 'flex';
     sess.messages.forEach((msg) => {
       appendMessageRowUI(msg.role, msg.content, msg.metrics);
     });
     scrollToBottom();
   }
 
-  // Send Message & Stream Tokens
+  // Send Message & Stream Response
   async function sendMessage(overrideText = null) {
-    const text = overrideText || chatInput.value.trim();
+    const text = overrideText || (chatInput ? chatInput.value.trim() : '');
     if (!text || isGenerating) return;
 
     const sess = sessions[currentSessionId];
@@ -211,6 +373,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     heroSection.style.display = 'none';
+    if (bottomInputContainer) bottomInputContainer.style.display = 'flex';
 
     // Append User Message
     sess.messages.push({ role: 'user', content: text });
@@ -219,8 +382,10 @@ document.addEventListener('DOMContentLoaded', () => {
     renderHistoryList();
 
     // Reset Input
-    chatInput.value = '';
-    chatInput.style.height = 'auto';
+    if (chatInput) {
+      chatInput.value = '';
+      chatInput.style.height = 'auto';
+    }
 
     // Prepare AI UI Row
     const aiRow = appendMessageRowUI('assistant', '');
@@ -229,8 +394,8 @@ document.addEventListener('DOMContentLoaded', () => {
     bubble.innerHTML = `<div class="typing-dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div>`;
 
     isGenerating = true;
-    btnSend.style.display = 'none';
-    btnStop.style.display = 'flex';
+    if (btnSend) btnSend.style.display = 'none';
+    if (btnStop) btnStop.style.display = 'flex';
     abortController = new AbortController();
 
     let fullText = '';
@@ -243,8 +408,7 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify({
           messages: sess.messages,
           persona: currentPersona,
-          temperature: parseFloat(tempSlider.value),
-          max_new_tokens: parseInt(tokensSlider.value, 10)
+          model: selectedModel
         })
       });
 
@@ -278,12 +442,15 @@ document.addEventListener('DOMContentLoaded', () => {
               if (data.done && data.metrics) {
                 const m = data.metrics;
                 footer.innerHTML = `
-                  <span class="metrics-badge">⚡ ${m.tok_per_sec} tok/s • ${m.tokens} tokens • ${m.time_sec}s</span>
-                  <div class="message-actions">
+                  <div class="message-actions-left">
+                    <button class="btn-action btn-copy-msg" title="Copy Response">📋 Copy</button>
+                    <button class="btn-action btn-thumb btn-thumb-up" title="Good Response">👍</button>
+                    <button class="btn-action btn-thumb btn-thumb-down" title="Bad Response">👎</button>
                     <button class="btn-action btn-regen" title="Regenerate">🔄 Regenerate</button>
                   </div>
+                  <span class="time-badge">${m.time_sec}s</span>
                 `;
-                attachMessageActions(aiRow, text);
+                attachMessageActions(aiRow, fullText, text);
               }
             } catch (e) {
               console.warn('JSON stream parse error:', e);
@@ -298,14 +465,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     } catch (err) {
       if (err.name === 'AbortError') {
-        bubble.innerHTML += `<br><em style="color: #94a3b8; font-size: 0.85rem;">[Generation Stopped]</em>`;
+        bubble.innerHTML += `<br><em style="color: var(--text-dim); font-size: 0.85rem;">[Generation Stopped]</em>`;
       } else {
         bubble.innerHTML = `<span style="color: #ef4444;">⚠️ Error communicating with Netcradus LLM: ${err.message}</span>`;
       }
     } finally {
       isGenerating = false;
-      btnSend.style.display = 'flex';
-      btnStop.style.display = 'none';
+      if (btnSend) btnSend.style.display = 'flex';
+      if (btnStop) btnStop.style.display = 'none';
       abortController = null;
     }
   }
@@ -323,7 +490,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const avatar = document.createElement('div');
     avatar.className = `avatar ${role === 'user' ? 'user-avatar' : 'ai-avatar'}`;
-    avatar.textContent = role === 'user' ? 'U' : 'AI';
+    avatar.textContent = role === 'user' ? 'N' : 'AI';
 
     const wrapper = document.createElement('div');
     wrapper.className = 'message-bubble-wrapper';
@@ -336,14 +503,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const footer = document.createElement('div');
     footer.className = 'message-footer';
 
-    if (role === 'assistant' && metrics) {
+    if (role === 'assistant' && content) {
+      const durationText = metrics && metrics.time_sec ? `${metrics.time_sec}s` : '';
       footer.innerHTML = `
-        <span class="metrics-badge">⚡ ${metrics.tok_per_sec} tok/s • ${metrics.tokens} tokens</span>
-        <div class="message-actions">
-          <button class="btn-action btn-regen">🔄 Regenerate</button>
+        <div class="message-actions-left">
+          <button class="btn-action btn-copy-msg" title="Copy Response">📋 Copy</button>
+          <button class="btn-action btn-thumb btn-thumb-up" title="Good Response">👍</button>
+          <button class="btn-action btn-thumb btn-thumb-down" title="Bad Response">👎</button>
+          <button class="btn-action btn-regen" title="Regenerate">🔄 Regenerate</button>
         </div>
+        ${durationText ? `<span class="time-badge">${durationText}</span>` : ''}
       `;
-      attachMessageActions(row, content);
+      attachMessageActions(row, content, null);
     }
 
     wrapper.appendChild(bubble);
@@ -357,14 +528,44 @@ document.addEventListener('DOMContentLoaded', () => {
     return row;
   }
 
-  function attachMessageActions(row, userQuery) {
+  function attachMessageActions(row, aiContent, userQuery) {
+    const copyBtn = row.querySelector('.btn-copy-msg');
+    const thumbUp = row.querySelector('.btn-thumb-up');
+    const thumbDown = row.querySelector('.btn-thumb-down');
     const regenBtn = row.querySelector('.btn-regen');
+
+    if (copyBtn) {
+      copyBtn.addEventListener('click', () => {
+        const temp = document.createElement('div');
+        temp.innerHTML = aiContent;
+        const textToCopy = temp.innerText || aiContent;
+        navigator.clipboard.writeText(textToCopy).then(() => {
+          copyBtn.textContent = '✓ Copied!';
+          setTimeout(() => { copyBtn.textContent = '📋 Copy'; }, 2000);
+        });
+      });
+    }
+
+    if (thumbUp) {
+      thumbUp.addEventListener('click', () => {
+        thumbUp.classList.toggle('active-feedback');
+        if (thumbDown) thumbDown.classList.remove('active-feedback');
+      });
+    }
+
+    if (thumbDown) {
+      thumbDown.addEventListener('click', () => {
+        thumbDown.classList.toggle('active-feedback');
+        if (thumbUp) thumbUp.classList.remove('active-feedback');
+      });
+    }
+
     if (regenBtn) {
       regenBtn.addEventListener('click', () => {
         const sess = sessions[currentSessionId];
         if (sess && sess.messages.length >= 2) {
-          sess.messages.pop(); // remove last AI
-          const lastUser = sess.messages.pop(); // remove last user
+          sess.messages.pop();
+          const lastUser = sess.messages.pop();
           saveSessionsToStorage();
           renderCurrentSessionMessages();
           sendMessage(lastUser.content);
@@ -382,7 +583,6 @@ document.addEventListener('DOMContentLoaded', () => {
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;");
 
-    // Code Blocks ```lang \n code ```
     formatted = formatted.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
       const language = (lang || 'code').toUpperCase();
       return `
@@ -396,16 +596,10 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
     });
 
-    // Inline code `code`
     formatted = formatted.replace(/`([^`]+)`/g, '<code>$1</code>');
-
-    // Bold **text**
     formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-
-    // Italic *text*
     formatted = formatted.replace(/\*([^*]+)\*/g, '<em>$1</em>');
 
-    // Convert linebreaks outside pre blocks
     const parts = formatted.split(/(<div class="code-wrapper">[\s\S]*?<\/div>)/g);
     for (let i = 0; i < parts.length; i++) {
       if (!parts[i].startsWith('<div class="code-wrapper">')) {

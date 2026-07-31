@@ -120,13 +120,11 @@ class NetcradusHTTPRequestHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         """Handle GET requests for static files & status API."""
-        if self.path in ("/", "/index.html"):
+        clean_path = self.path.split("?")[0].lstrip("/")
+        
+        if not clean_path or clean_path == "index.html":
             self.send_file_response(os.path.join(WEB_DIR, "index.html"), "text/html; charset=utf-8")
-        elif self.path == "/styles.css":
-            self.send_file_response(os.path.join(WEB_DIR, "styles.css"), "text/css; charset=utf-8")
-        elif self.path == "/app.js":
-            self.send_file_response(os.path.join(WEB_DIR, "app.js"), "application/javascript; charset=utf-8")
-        elif self.path == "/api/status":
+        elif clean_path == "api/status":
             status_data = {
                 "status": "online",
                 "model_name": "Netcradus LLM v1.0",
@@ -136,7 +134,23 @@ class NetcradusHTTPRequestHandler(BaseHTTPRequestHandler):
             }
             self.send_json_response(status_data)
         else:
-            self.send_error(404, "Page Not Found")
+            filepath = os.path.join(WEB_DIR, clean_path)
+            if os.path.isfile(filepath):
+                ext = os.path.splitext(filepath)[1].lower()
+                content_types = {
+                    ".css": "text/css; charset=utf-8",
+                    ".js": "application/javascript; charset=utf-8",
+                    ".png": "image/png",
+                    ".jpg": "image/jpeg",
+                    ".jpeg": "image/jpeg",
+                    ".svg": "image/svg+xml",
+                    ".ico": "image/x-icon",
+                    ".html": "text/html; charset=utf-8"
+                }
+                content_type = content_types.get(ext, "application/octet-stream")
+                self.send_file_response(filepath, content_type)
+            else:
+                self.send_error(404, "Page Not Found")
 
     def do_POST(self):
         """Handle POST requests for /api/chat & /api/chat/stream endpoints."""
@@ -153,7 +167,7 @@ class NetcradusHTTPRequestHandler(BaseHTTPRequestHandler):
             messages = payload.get("messages", [])
             persona = payload.get("persona", "general")
             temperature = float(payload.get("temperature", 0.7))
-            max_new_tokens = int(payload.get("max_new_tokens", 128))
+            max_new_tokens = int(payload.get("max_new_tokens", 512))
 
             if not messages:
                 self.send_json_response({"error": "No messages provided"}, 400)
