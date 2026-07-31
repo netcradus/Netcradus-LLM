@@ -46,6 +46,45 @@ document.addEventListener('DOMContentLoaded', () => {
   const settingsModalBackdrop = document.getElementById('settings-modal-backdrop');
   const btnCloseModal = document.getElementById('btn-close-modal');
 
+  // Authentication DOM Elements
+  const authOverlay = document.getElementById('auth-overlay');
+  const tabSignin = document.getElementById('tab-signin');
+  const tabSignup = document.getElementById('tab-signup');
+  const formSignin = document.getElementById('form-signin');
+  const formSignup = document.getElementById('form-signup');
+  const signinEmail = document.getElementById('signin-email');
+  const signinPassword = document.getElementById('signin-password');
+  const signupName = document.getElementById('signup-name');
+  const signupEmail = document.getElementById('signup-email');
+  const signupPassword = document.getElementById('signup-password');
+  const btnSubmitSignin = document.getElementById('btn-submit-signin');
+  const btnSubmitSignup = document.getElementById('btn-submit-signup');
+  const signinSpinner = document.getElementById('signin-spinner');
+  const signupSpinner = document.getElementById('signup-spinner');
+  const btnGoogleSignin = document.getElementById('btn-google-signin');
+  const btnGuestMode = document.getElementById('btn-guest-mode');
+  const authAlert = document.getElementById('auth-alert');
+  const btnForgotPassword = document.getElementById('btn-forgot-password');
+  const resetPasswordBackdrop = document.getElementById('reset-password-backdrop');
+  const btnCloseResetModal = document.getElementById('btn-close-reset-modal');
+  const resetEmail = document.getElementById('reset-email');
+  const btnSendResetEmail = document.getElementById('btn-send-reset-email');
+  const resetModalAlert = document.getElementById('reset-modal-alert');
+  const btnMenuLogout = document.getElementById('btn-menu-logout');
+  const btnModalLogout = document.getElementById('btn-modal-logout');
+
+  // User Profile DOM Elements across UI
+  const sidebarUserAvatar = document.getElementById('sidebar-user-avatar');
+  const sidebarUserName = document.getElementById('sidebar-user-name');
+  const sidebarUserPlan = document.getElementById('sidebar-user-plan');
+  const dropdownUserName = document.getElementById('dropdown-user-name');
+  const dropdownUserBadge = document.getElementById('dropdown-user-badge');
+  const dropdownUserEmail = document.getElementById('dropdown-user-email');
+  const modalUserAvatar = document.getElementById('modal-user-avatar');
+  const modalUserName = document.getElementById('modal-user-name');
+  const modalUserEmail = document.getElementById('modal-user-email');
+  const modalUserProvider = document.getElementById('modal-user-provider');
+
   // State Management
   let currentPersona = 'general';
   let selectedModel = 'netcradus-1.0-pro';
@@ -54,6 +93,217 @@ document.addEventListener('DOMContentLoaded', () => {
   let abortController = null;
   let sessions = loadSessionsFromStorage();
   let currentSessionId = createNewSession();
+
+  // Auth Alert Helper
+  function showAuthAlert(elem, msg, type = 'error') {
+    if (!elem) return;
+    elem.textContent = msg;
+    elem.className = `auth-alert ${type}`;
+    elem.style.display = 'block';
+  }
+
+  function hideAuthAlert(elem) {
+    if (!elem) return;
+    elem.style.display = 'none';
+  }
+
+  // Update Profile UI with logged-in user data
+  function updateUserProfileUI(user) {
+    if (!user) return;
+    const displayName = user.displayName || (user.email ? user.email.split('@')[0] : 'Netcradus User');
+    const email = user.email || 'guest@netcradus.local';
+    const initial = displayName.charAt(0).toUpperCase() || 'N';
+    const providerLabel = user.provider === 'google.com' ? 'Google Auth' :
+                         (user.provider === 'firebase-email' ? 'Firebase Auth' : 'Guest Mode');
+
+    if (sidebarUserAvatar) sidebarUserAvatar.textContent = initial;
+    if (headerAvatarTrigger) headerAvatarTrigger.textContent = initial;
+    if (modalUserAvatar) modalUserAvatar.textContent = initial;
+    if (sidebarUserName) sidebarUserName.textContent = displayName;
+    if (sidebarUserPlan) sidebarUserPlan.textContent = providerLabel;
+    if (dropdownUserName) dropdownUserName.textContent = displayName;
+    if (dropdownUserBadge) dropdownUserBadge.textContent = providerLabel;
+    if (dropdownUserEmail) dropdownUserEmail.textContent = email;
+    if (modalUserName) modalUserName.textContent = displayName;
+    if (modalUserEmail) modalUserEmail.textContent = email;
+    if (modalUserProvider) modalUserProvider.textContent = `Connected via ${providerLabel}`;
+  }
+
+  // Auth Overlay Visibility
+  function showAuthOverlay() {
+    if (authOverlay) authOverlay.style.display = 'flex';
+    if (appContainer) appContainer.style.display = 'none';
+  }
+
+  function hideAuthOverlay() {
+    if (authOverlay) authOverlay.style.display = 'none';
+    if (appContainer) appContainer.style.display = 'flex';
+  }
+
+  // Initialize Auth Observer
+  if (window.NetcradusAuth) {
+    window.NetcradusAuth.onAuthUserStateChanged((user) => {
+      if (user) {
+        updateUserProfileUI(user);
+        hideAuthOverlay();
+      } else {
+        showAuthOverlay();
+      }
+    });
+  } else {
+    hideAuthOverlay();
+  }
+
+  // Auth Tab Switching
+  if (tabSignin && tabSignup) {
+    tabSignin.addEventListener('click', () => {
+      tabSignin.classList.add('active');
+      tabSignup.classList.remove('active');
+      formSignin.style.display = 'flex';
+      formSignup.style.display = 'none';
+      hideAuthAlert(authAlert);
+    });
+
+    tabSignup.addEventListener('click', () => {
+      tabSignup.classList.add('active');
+      tabSignin.classList.remove('active');
+      formSignup.style.display = 'flex';
+      formSignin.style.display = 'none';
+      hideAuthAlert(authAlert);
+    });
+  }
+
+  // Sign In Form Submission
+  if (formSignin) {
+    formSignin.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideAuthAlert(authAlert);
+
+      const email = signinEmail ? signinEmail.value.trim() : '';
+      const password = signinPassword ? signinPassword.value : '';
+
+      if (!email || !password) {
+        showAuthAlert(authAlert, 'Please fill in all email and password fields.');
+        return;
+      }
+
+      try {
+        if (btnSubmitSignin) btnSubmitSignin.disabled = true;
+        if (signinSpinner) signinSpinner.style.display = 'inline-block';
+        const user = await window.NetcradusAuth.signInEmailPassword(email, password);
+        updateUserProfileUI(user);
+        hideAuthOverlay();
+      } catch (err) {
+        console.error("Sign in failed:", err);
+        const errMsg = err.message || 'Failed to sign in. Please check your email and password.';
+        showAuthAlert(authAlert, errMsg);
+      } finally {
+        if (btnSubmitSignin) btnSubmitSignin.disabled = false;
+        if (signinSpinner) signinSpinner.style.display = 'none';
+      }
+    });
+  }
+
+  // Create Account Form Submission
+  if (formSignup) {
+    formSignup.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideAuthAlert(authAlert);
+
+      const name = signupName ? signupName.value.trim() : '';
+      const email = signupEmail ? signupEmail.value.trim() : '';
+      const password = signupPassword ? signupPassword.value : '';
+
+      if (!email || !password) {
+        showAuthAlert(authAlert, 'Please fill in all required fields.');
+        return;
+      }
+
+      try {
+        if (btnSubmitSignup) btnSubmitSignup.disabled = true;
+        if (signupSpinner) signupSpinner.style.display = 'inline-block';
+        const user = await window.NetcradusAuth.signUpEmailPassword(email, password, name);
+        updateUserProfileUI(user);
+        hideAuthOverlay();
+      } catch (err) {
+        console.error("Sign up failed:", err);
+        const errMsg = err.message || 'Failed to create account. Email may already be in use.';
+        showAuthAlert(authAlert, errMsg);
+      } finally {
+        if (btnSubmitSignup) btnSubmitSignup.disabled = false;
+        if (signupSpinner) signupSpinner.style.display = 'none';
+      }
+    });
+  }
+
+  // Google Sign In Button
+  if (btnGoogleSignin) {
+    btnGoogleSignin.addEventListener('click', async () => {
+      hideAuthAlert(authAlert);
+      try {
+        const user = await window.NetcradusAuth.signInWithGoogle();
+        updateUserProfileUI(user);
+        hideAuthOverlay();
+      } catch (err) {
+        console.error("Google sign in failed:", err);
+        showAuthAlert(authAlert, err.message || 'Google sign in canceled or failed.');
+      }
+    });
+  }
+
+  // Guest Mode Button
+  if (btnGuestMode) {
+    btnGuestMode.addEventListener('click', () => {
+      const guest = window.NetcradusAuth.continueAsGuest();
+      updateUserProfileUI(guest);
+      hideAuthOverlay();
+    });
+  }
+
+  // Password Reset Modal Controls
+  if (btnForgotPassword) {
+    btnForgotPassword.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (resetPasswordBackdrop) resetPasswordBackdrop.style.display = 'flex';
+      hideAuthAlert(resetModalAlert);
+    });
+  }
+
+  if (btnCloseResetModal) {
+    btnCloseResetModal.addEventListener('click', () => {
+      if (resetPasswordBackdrop) resetPasswordBackdrop.style.display = 'none';
+    });
+  }
+
+  if (btnSendResetEmail) {
+    btnSendResetEmail.addEventListener('click', async () => {
+      const email = resetEmail ? resetEmail.value.trim() : '';
+      if (!email) {
+        showAuthAlert(resetModalAlert, 'Please enter your account email address.');
+        return;
+      }
+      try {
+        await window.NetcradusAuth.sendPasswordReset(email);
+        showAuthAlert(resetModalAlert, 'Password reset link sent! Check your email inbox.', 'success');
+        setTimeout(() => {
+          if (resetPasswordBackdrop) resetPasswordBackdrop.style.display = 'none';
+        }, 2500);
+      } catch (err) {
+        showAuthAlert(resetModalAlert, err.message || 'Failed to send reset email.');
+      }
+    });
+  }
+
+  // Log Out Controls
+  const handleLogout = async () => {
+    if (profileMenuDropdown) profileMenuDropdown.style.display = 'none';
+    if (settingsModalBackdrop) settingsModalBackdrop.style.display = 'none';
+    await window.NetcradusAuth.signOutUser();
+    showAuthOverlay();
+  };
+
+  if (btnMenuLogout) btnMenuLogout.addEventListener('click', handleLogout);
+  if (btnModalLogout) btnModalLogout.addEventListener('click', handleLogout);
 
   // Initialize UI
   renderHistoryList();
