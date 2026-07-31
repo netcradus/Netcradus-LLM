@@ -174,7 +174,9 @@ class NetcradusHTTPRequestHandler(BaseHTTPRequestHandler):
                 return
 
             last_user_msg = messages[-1].get("content", "")
-            logger.info(f"Query: '{last_user_msg}' [Persona: {persona}, Temp: {temperature}, MaxTokens: {max_new_tokens}]")
+            user_info = payload.get("user") or {}
+            user_str = f" [User: {user_info.get('name', 'Anonymous')} ({user_info.get('uid', 'guest')})]" if user_info else ""
+            logger.info(f"Query: '{last_user_msg}' [Persona: {persona}, Temp: {temperature}, MaxTokens: {max_new_tokens}]{user_str}")
 
             # Prepend system prompt for persona if not present
             system_prompt = PERSONA_SYSTEM_PROMPTS.get(persona, PERSONA_SYSTEM_PROMPTS["general"])

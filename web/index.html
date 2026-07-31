@@ -16,163 +16,12 @@
 
   <!-- Design Stylesheet -->
   <link rel="stylesheet" href="styles.css">
- 
 </head>
 
 <body>
 
-  <!-- Authentication Screen / Overlay -->
-  <div class="auth-overlay" id="auth-overlay">
-    <div class="auth-card">
-      <div class="auth-header">
-        <h1 class="auth-title">Welcome to <span class="auth-title-accent">Netcradus LLM</span></h1>
-        <p class="auth-subtitle">Sign in to access your cybersecurity & intelligence assistant.</p>
-      </div>
-
-      <!-- Auth Alert Notification Banner -->
-      <div class="auth-alert" id="auth-alert" style="display: none;"></div>
-
-      <!-- Auth Tab Navigation -->
-      <div class="auth-tabs">
-        <button class="auth-tab active" id="tab-signin">Sign In</button>
-        <button class="auth-tab" id="tab-signup">Create Account</button>
-      </div>
-
-      <!-- Sign In Form -->
-      <form class="auth-form" id="form-signin">
-        <div class="form-group">
-          <label for="signin-email">Email Address</label>
-          <div class="input-with-icon">
-            <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-              <polyline points="22,6 12,13 2,6"/>
-            </svg>
-            <input type="email" id="signin-email" placeholder="name@company.com" required autocomplete="email">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <div class="label-row">
-            <label for="signin-password">Password</label>
-            <a href="#" class="btn-forgot-password" id="btn-forgot-password">Forgot password?</a>
-          </div>
-          <div class="input-with-icon">
-            <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-            </svg>
-            <input type="password" id="signin-password" placeholder="••••••••" required autocomplete="current-password">
-          </div>
-        </div>
-
-        <div class="form-options">
-          <label class="checkbox-label">
-            <input type="checkbox" id="remember-me" checked>
-            <span>Remember me</span>
-          </label>
-        </div>
-
-        <button type="submit" class="btn-auth-primary" id="btn-submit-signin">
-          <span class="btn-text">Sign In</span>
-          <div class="spinner" id="signin-spinner" style="display: none;"></div>
-        </button>
-      </form>
-
-      <!-- Create Account Form (Hidden by default) -->
-      <form class="auth-form" id="form-signup" style="display: none;">
-        <div class="form-group">
-          <label for="signup-name">Full Name</label>
-          <div class="input-with-icon">
-            <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-              <circle cx="12" cy="7" r="4"/>
-            </svg>
-            <input type="text" id="signup-name" placeholder="Alex Mercer" required autocomplete="name">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="signup-email">Email Address</label>
-          <div class="input-with-icon">
-            <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-              <polyline points="22,6 12,13 2,6"/>
-            </svg>
-            <input type="email" id="signup-email" placeholder="name@company.com" required autocomplete="email">
-          </div>
-        </div>
-
-        <div class="form-group">
-          <label for="signup-password">Password</label>
-          <div class="input-with-icon">
-            <svg class="input-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
-              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-            </svg>
-            <input type="password" id="signup-password" placeholder="At least 6 characters" required autocomplete="new-password" minlength="6">
-          </div>
-        </div>
-
-        <button type="submit" class="btn-auth-primary" id="btn-submit-signup">
-          <span class="btn-text">Create Account</span>
-          <div class="spinner" id="signup-spinner" style="display: none;"></div>
-        </button>
-      </form>
-
-      <div class="auth-divider">
-        <span>OR</span>
-      </div>
-
-      <!-- Social & Guest Options -->
-      <div class="auth-actions">
-        <button type="button" class="btn-social-auth" id="btn-google-signin">
-          <svg width="18" height="18" viewBox="0 0 24 24">
-            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
-            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
-          </svg>
-          Sign in with Google
-        </button>
-
-        <button type="button" class="btn-guest-auth" id="btn-guest-mode">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-            <circle cx="12" cy="7" r="4"/>
-          </svg>
-          Continue as Guest
-        </button>
-      </div>
-
-      <div class="auth-footer-note">
-        <span>Protected by Firebase Auth Security</span>
-      </div>
-    </div>
-  </div>
-
-  <!-- Password Reset Modal -->
-  <div class="modal-backdrop" id="reset-password-backdrop" style="display: none;">
-    <div class="modal-card">
-      <div class="modal-header">
-        <h3>🔑 Reset Password</h3>
-        <button class="btn-close-modal" id="btn-close-reset-modal">✕</button>
-      </div>
-      <div class="modal-body">
-        <p class="modal-desc">Enter your account email to receive a password reset link.</p>
-        <div class="form-group" style="margin-top: 14px;">
-          <label for="reset-email">Email Address</label>
-          <input type="email" id="reset-email" class="modal-input" placeholder="name@company.com" required>
-        </div>
-        <div class="auth-alert" id="reset-modal-alert" style="display: none;"></div>
-        <button type="button" class="btn-auth-primary" id="btn-send-reset-email" style="margin-top: 16px;">
-          Send Reset Link
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <!-- Main App Container (Revealed upon Authentication) -->
-  <div class="app-container" id="app-container" style="display: none;">
+  <!-- Main App Container -->
+  <div class="app-container" id="app-container">
 
     <!-- Sidebar Navigation -->
     <aside class="sidebar" id="sidebar">
@@ -211,7 +60,7 @@
           <div class="user-avatar" id="sidebar-user-avatar">N</div>
           <div class="user-details">
             <span class="user-name" id="sidebar-user-name">Netcradus User</span>
-            <span class="user-plan" id="sidebar-user-plan">Firebase User</span>
+            <span class="user-plan" id="sidebar-user-plan">Pro Plan</span>
           </div>
         </div>
         <button class="btn-icon-toggle" id="btn-settings" title="Profile & Settings">
@@ -227,7 +76,8 @@
           <div class="menu-user-header">
             <strong id="dropdown-user-name">Netcradus User</strong>
             <span class="menu-user-badge" id="dropdown-user-badge">Pro Plan</span>
-            <small id="dropdown-user-email" style="display: block; color: var(--text-dim); margin-top: 2px; font-size: 0.75rem;"></small>
+            <small id="dropdown-user-email"
+              style="display: block; color: var(--text-dim); margin-top: 2px; font-size: 0.75rem;"></small>
           </div>
           <div class="menu-divider"></div>
           <button class="menu-item" id="btn-menu-settings">
@@ -236,8 +86,7 @@
           <button class="menu-item menu-item-danger" id="btn-menu-clear-history">
             🗑️ <span>Clear All History</span>
           </button>
-          <div class="menu-divider"></div>
-          <button class="menu-item menu-item-logout" id="btn-menu-logout">
+          <button class="menu-item menu-item-danger" id="btn-menu-logout">
             🚪 <span>Log Out</span>
           </button>
         </div>
@@ -264,9 +113,12 @@
               <option value="netcradus-1.0-code">💻 Netcradus 1.0 Code</option>
             </select>
           </div>
+
+
         </div>
 
-        <div class="header-right" style="display: flex; gap: 12px; align-items: center;">
+        <div class="header-right" style="display: flex; gap: 10px; align-items: center;">
+          <button class="btn-theme-toggle" id="btn-theme-toggle" title="Toggle Theme">🌙</button>
           <button class="btn-header-action" id="btn-clear-chat" title="Clear Current Chat">
             Clear Chat
           </button>
@@ -284,13 +136,17 @@
               <div class="hero-content-left">
                 <div class="hero-badge-welcome">✨ WELCOME TO</div>
                 <h1 class="hero-title-main">Netcradus <span class="hero-title-accent">LLM</span></h1>
-                <p class="hero-subtitle">Your AI assistant for cybersecurity intelligence, threat analysis, and knowledge discovery.</p>
+                <p class="hero-subtitle">Your AI assistant for cybersecurity intelligence, threat analysis, and
+                  knowledge discovery.</p>
               </div>
             </div>
 
+
+
             <!-- Prominent Input Card inside Hero -->
             <div class="hero-input-card">
-              <textarea class="chat-input hero-chat-input" id="hero-chat-input" placeholder="How can I help you today?"
+              <div class="attachment-preview-box" id="hero-attachment-preview" style="display: none;"></div>
+              <textarea class="chat-input hero-chat-input" id="hero-chat-input" placeholder="Ask Netcradus LLM anything..."
                 rows="3"></textarea>
               <div class="input-card-bottom">
                 <button class="btn-attach-pill" id="btn-hero-attach">
@@ -312,6 +168,8 @@
               </div>
             </div>
 
+
+
           </div>
 
         </div>
@@ -320,36 +178,39 @@
       <!-- Bottom Fixed Input Bar (Shown when active conversation exists) -->
       <footer class="input-container" id="bottom-input-container" style="display: none;">
         <div class="input-box-wrapper">
-          <button class="btn-input-tool" id="btn-attach" title="Attach file">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 5v14M5 12h14" />
-            </svg>
-          </button>
-
-          <textarea class="chat-input" id="chat-input" placeholder="Ask Netcradus LLM anything..." rows="1"></textarea>
-
-          <div class="input-actions">
-            <button class="btn-input-tool" id="btn-mic" title="Voice Input">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
-                <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
-                <line x1="12" y1="19" x2="12" y2="23" />
-                <line x1="8" y1="23" x2="16" y2="23" />
+          <div class="attachment-preview-box" id="bottom-attachment-preview" style="display: none;"></div>
+          <div class="input-row-flex">
+            <button class="btn-input-tool" id="btn-attach" title="Attach file">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 5v14M5 12h14" />
               </svg>
             </button>
 
-            <button class="btn-stop" id="btn-stop" title="Stop Generation" style="display: none;">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                <rect x="4" y="4" width="16" height="16" rx="2" />
-              </svg>
-            </button>
+            <textarea class="chat-input" id="chat-input" placeholder="Ask Netcradus LLM anything..." rows="1"></textarea>
 
-            <button class="btn-send" id="btn-send" title="Send Message">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <line x1="22" y1="2" x2="11" y2="13" />
-                <polygon points="22 2 15 22 11 13 2 9 22 2" />
-              </svg>
-            </button>
+            <div class="input-actions">
+              <button class="btn-input-tool" id="btn-mic" title="Voice Input">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                  <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                  <line x1="12" y1="19" x2="12" y2="23" />
+                  <line x1="8" y1="23" x2="16" y2="23" />
+                </svg>
+              </button>
+
+              <button class="btn-stop" id="btn-stop" title="Stop Generation" style="display: none;">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                  <rect x="4" y="4" width="16" height="16" rx="2" />
+                </svg>
+              </button>
+
+              <button class="btn-send" id="btn-send" title="Send Message">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <line x1="22" y1="2" x2="11" y2="13" />
+                  <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                </svg>
+              </button>
+            </div>
           </div>
         </div>
         <div class="disclaimer-text">
@@ -376,7 +237,7 @@
             <div class="user-avatar" id="modal-user-avatar">N</div>
             <div>
               <strong id="modal-user-name">Netcradus User</strong>
-              <div class="user-plan" id="modal-user-email">user@netcradus.com</div>
+              <div class="user-plan" id="modal-user-email">user@netcradus.ai</div>
               <small id="modal-user-provider" style="color: var(--accent-primary); font-weight: 500;"></small>
             </div>
           </div>
@@ -391,14 +252,18 @@
           </select>
         </div>
 
-        <div class="settings-group">
-          <label class="settings-label">Clear All History</label>
-          <p class="settings-desc">Wipe all stored chat sessions from local storage.</p>
-          <button class="btn-danger" id="btn-modal-clear-history">🗑️ Clear All Chat History</button>
+        <div class="settings-group" style="margin-top: 16px;">
+          <label class="settings-label">Interface Theme</label>
+          <div style="display: flex; gap: 10px;">
+            <button class="btn-header-action" id="btn-modal-theme-light" style="flex: 1;">☀️ Light Theme</button>
+            <button class="btn-header-action" id="btn-modal-theme-dark" style="flex: 1;">🌙 Dark Theme</button>
+          </div>
         </div>
 
-        <div class="settings-group" style="border-top: 1px solid var(--border-color); pt-3; margin-top: 16px; padding-top: 16px;">
-          <button class="btn-danger" id="btn-modal-logout" style="background-color: #e11d48; border-color: #be123c;">🚪 Log Out of Session</button>
+        <div class="settings-group" style="margin-top: 16px;">
+          <button class="btn-header-action" id="btn-modal-logout" style="width: 100%; color: #ef4444; border-color: rgba(239,68,68,0.4); font-weight: 600;">
+            🚪 Log Out
+          </button>
         </div>
 
       </div>
@@ -408,11 +273,8 @@
   <!-- Hidden File Input for Attach Tool -->
   <input type="file" id="file-upload-input" style="display: none;">
 
-  <!-- Firebase SDK Compatibility Libraries -->
- <script src="app.js"></script>
-
-<script type="module" src="firebase-config.js"></script>
-<script type="module" src="login.js"></script>
+  <script src="app.js"></script>
 
 </body>
+
 </html>

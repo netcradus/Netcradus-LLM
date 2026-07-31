@@ -1,79 +1,69 @@
 /**
- * Netcradus LLM - Professional ChatGPT & Gemini Web Application Logic
+ * Netcradus LLM - Production Application Controller (app.js)
+ * 
+ * Features:
+ * - Real-time SSE Token Streaming with multi-turn session persistence.
+ * - Persona switching (General, Coding Expert, Deep Reasoning, Creative Security).
+ * - Hero input card & quick-start capability prompt cards.
+ * - Speech-to-Text Voice Dictation (Web Speech API).
+ * - File Attachment reader (code, text, log files).
+ * - Markdown & Collapsible Thought Process (<details class='reasoning-block'>) parser.
+ * - Light & Dark Theme Switcher with localStorage persistence.
  */
 
 document.addEventListener('DOMContentLoaded', () => {
-  // DOM Elements
+  // DOM Elements - Main Layout & Navigation
   const appContainer = document.getElementById('app-container');
-  const chatInput = document.getElementById('chat-input');
-  const btnSend = document.getElementById('btn-send');
-  const btnStop = document.getElementById('btn-stop');
-  const messagesWrapper = document.getElementById('messages-wrapper');
-  const messagesContainer = document.getElementById('messages-container');
-  const heroSection = document.getElementById('hero-section');
-  const bottomInputContainer = document.getElementById('bottom-input-container');
+  const sidebar = document.getElementById('sidebar');
+  const btnSidebarCollapse = document.getElementById('btn-sidebar-collapse');
+  const btnSidebarExpand = document.getElementById('btn-sidebar-expand');
   const btnNewChat = document.getElementById('btn-new-chat');
   const btnClearChat = document.getElementById('btn-clear-chat');
   const historyList = document.getElementById('history-list');
-  const modelSelector = document.getElementById('model-selector');
-  const modalModelSelect = document.getElementById('modal-model-select');
-  const btnThemeToggle = document.getElementById('btn-theme-toggle');
-  const themeIcon = document.getElementById('theme-icon');
-  const themeText = document.getElementById('theme-text');
+  const btnSidebarClearHistory = document.getElementById('btn-sidebar-clear-history');
 
-  // Hero Card Input Elements
+  // DOM Elements - Hero Section & Input Tools
+  const heroSection = document.getElementById('hero-section');
   const heroChatInput = document.getElementById('hero-chat-input');
   const btnHeroSend = document.getElementById('btn-hero-send');
   const btnHeroAttach = document.getElementById('btn-hero-attach');
-  const heroCategorySelect = document.getElementById('hero-category-select');
+  const heroAttachmentPreview = document.getElementById('hero-attachment-preview');
+  const quickCards = document.querySelectorAll('.quick-card');
 
-  // Sidebar Toggles & Input Tools
-  const btnSidebarCollapse = document.getElementById('btn-sidebar-collapse');
-  const btnSidebarExpand = document.getElementById('btn-sidebar-expand');
+  // DOM Elements - Bottom Chat Input Bar
+  const bottomInputContainer = document.getElementById('bottom-input-container');
+  const bottomAttachmentPreview = document.getElementById('bottom-attachment-preview');
+  const chatInput = document.getElementById('chat-input');
+  const btnSend = document.getElementById('btn-send');
+  const btnStop = document.getElementById('btn-stop');
   const btnAttach = document.getElementById('btn-attach');
   const btnMic = document.getElementById('btn-mic');
   const fileUploadInput = document.getElementById('file-upload-input');
+  const messagesContainer = document.getElementById('messages-container');
+  const messagesWrapper = document.getElementById('messages-wrapper');
 
-  // Profile Options & Clear History Elements
+  // DOM Elements - Header, Persona & Theme
+  const modelSelector = document.getElementById('model-selector');
+  const modalModelSelect = document.getElementById('modal-model-select');
+  const btnThemeToggle = document.getElementById('btn-theme-toggle');
+  const btnModalThemeLight = document.getElementById('btn-modal-theme-light');
+  const btnModalThemeDark = document.getElementById('btn-modal-theme-dark');
+  const headerPersonaPills = document.querySelectorAll('#header-persona-pills .persona-pill');
+  const heroPersonaBtns = document.querySelectorAll('.hero-persona-btn');
+
+  // DOM Elements - User Profile & Modals
   const userProfileTrigger = document.getElementById('user-profile-trigger');
   const headerAvatarTrigger = document.getElementById('header-avatar-trigger');
   const btnSettings = document.getElementById('btn-settings');
   const profileMenuDropdown = document.getElementById('profile-menu-dropdown');
   const btnMenuSettings = document.getElementById('btn-menu-settings');
   const btnMenuClearHistory = document.getElementById('btn-menu-clear-history');
-  const btnSidebarClearHistory = document.getElementById('btn-sidebar-clear-history');
-  const btnModalClearHistory = document.getElementById('btn-modal-clear-history');
+  const btnMenuLogout = document.getElementById('btn-menu-logout');
+  const btnModalLogout = document.getElementById('btn-modal-logout');
   const settingsModalBackdrop = document.getElementById('settings-modal-backdrop');
   const btnCloseModal = document.getElementById('btn-close-modal');
 
-  // Authentication DOM Elements
-  const authOverlay = document.getElementById('auth-overlay');
-  const tabSignin = document.getElementById('tab-signin');
-  const tabSignup = document.getElementById('tab-signup');
-  const formSignin = document.getElementById('form-signin');
-  const formSignup = document.getElementById('form-signup');
-  const signinEmail = document.getElementById('signin-email');
-  const signinPassword = document.getElementById('signin-password');
-  const signupName = document.getElementById('signup-name');
-  const signupEmail = document.getElementById('signup-email');
-  const signupPassword = document.getElementById('signup-password');
-  const btnSubmitSignin = document.getElementById('btn-submit-signin');
-  const btnSubmitSignup = document.getElementById('btn-submit-signup');
-  const signinSpinner = document.getElementById('signin-spinner');
-  const signupSpinner = document.getElementById('signup-spinner');
-  const btnGoogleSignin = document.getElementById('btn-google-signin');
-  const btnGuestMode = document.getElementById('btn-guest-mode');
-  const authAlert = document.getElementById('auth-alert');
-  const btnForgotPassword = document.getElementById('btn-forgot-password');
-  const resetPasswordBackdrop = document.getElementById('reset-password-backdrop');
-  const btnCloseResetModal = document.getElementById('btn-close-reset-modal');
-  const resetEmail = document.getElementById('reset-email');
-  const btnSendResetEmail = document.getElementById('btn-send-reset-email');
-  const resetModalAlert = document.getElementById('reset-modal-alert');
-  const btnMenuLogout = document.getElementById('btn-menu-logout');
-  const btnModalLogout = document.getElementById('btn-modal-logout');
-
-  // User Profile DOM Elements across UI
+  // User Profile Labels
   const sidebarUserAvatar = document.getElementById('sidebar-user-avatar');
   const sidebarUserName = document.getElementById('sidebar-user-name');
   const sidebarUserPlan = document.getElementById('sidebar-user-plan');
@@ -85,440 +75,243 @@ document.addEventListener('DOMContentLoaded', () => {
   const modalUserEmail = document.getElementById('modal-user-email');
   const modalUserProvider = document.getElementById('modal-user-provider');
 
-  // State Management
+  // Application State
   let currentPersona = 'general';
   let selectedModel = 'netcradus-1.0-pro';
   let currentTheme = localStorage.getItem('netcradus_theme') || 'light';
   let isGenerating = false;
   let abortController = null;
+  let attachedFile = null; // { name, content, size }
+  let speechRecognition = null;
+  let isRecording = false;
+
   let sessions = loadSessionsFromStorage();
   let currentSessionId = createNewSession();
 
-  // Auth Alert Helper
-  function showAuthAlert(elem, msg, type = 'error') {
-    if (!elem) return;
-    elem.textContent = msg;
-    elem.className = `auth-alert ${type}`;
-    elem.style.display = 'block';
-  }
-
-  function hideAuthAlert(elem) {
-    if (!elem) return;
-    elem.style.display = 'none';
-  }
-
-  // Update Profile UI with logged-in user data
-  function updateUserProfileUI(user) {
-    if (!user) return;
-    const displayName = user.displayName || (user.email ? user.email.split('@')[0] : 'Netcradus User');
-    const email = user.email || 'guest@netcradus.local';
-    const initial = displayName.charAt(0).toUpperCase() || 'N';
-    const providerLabel = user.provider === 'google.com' ? 'Google Auth' :
-                         (user.provider === 'firebase-email' ? 'Firebase Auth' : 'Guest Mode');
-
-    if (sidebarUserAvatar) sidebarUserAvatar.textContent = initial;
-    if (headerAvatarTrigger) headerAvatarTrigger.textContent = initial;
-    if (modalUserAvatar) modalUserAvatar.textContent = initial;
-    if (sidebarUserName) sidebarUserName.textContent = displayName;
-    if (sidebarUserPlan) sidebarUserPlan.textContent = providerLabel;
-    if (dropdownUserName) dropdownUserName.textContent = displayName;
-    if (dropdownUserBadge) dropdownUserBadge.textContent = providerLabel;
-    if (dropdownUserEmail) dropdownUserEmail.textContent = email;
-    if (modalUserName) modalUserName.textContent = displayName;
-    if (modalUserEmail) modalUserEmail.textContent = email;
-    if (modalUserProvider) modalUserProvider.textContent = `Connected via ${providerLabel}`;
-  }
-
-  // Auth Overlay Visibility
-  function showAuthOverlay() {
-    if (authOverlay) authOverlay.style.display = 'flex';
-    if (appContainer) appContainer.style.display = 'none';
-  }
-
-  function hideAuthOverlay() {
-    if (authOverlay) authOverlay.style.display = 'none';
-    if (appContainer) appContainer.style.display = 'flex';
-  }
-
-  // Initialize Auth Observer
-  if (window.NetcradusAuth) {
-    window.NetcradusAuth.onAuthUserStateChanged((user) => {
-      if (user) {
-        updateUserProfileUI(user);
-        hideAuthOverlay();
-      } else {
-        showAuthOverlay();
-      }
-    });
-  } else {
-    hideAuthOverlay();
-  }
-
-  // Auth Tab Switching
-  if (tabSignin && tabSignup) {
-    tabSignin.addEventListener('click', () => {
-      tabSignin.classList.add('active');
-      tabSignup.classList.remove('active');
-      formSignin.style.display = 'flex';
-      formSignup.style.display = 'none';
-      hideAuthAlert(authAlert);
-    });
-
-    tabSignup.addEventListener('click', () => {
-      tabSignup.classList.add('active');
-      tabSignin.classList.remove('active');
-      formSignup.style.display = 'flex';
-      formSignin.style.display = 'none';
-      hideAuthAlert(authAlert);
-    });
-  }
-
-  // Sign In Form Submission
-  if (formSignin) {
-    formSignin.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      hideAuthAlert(authAlert);
-
-      const email = signinEmail ? signinEmail.value.trim() : '';
-      const password = signinPassword ? signinPassword.value : '';
-
-      if (!email || !password) {
-        showAuthAlert(authAlert, 'Please fill in all email and password fields.');
-        return;
-      }
-
-      try {
-        if (btnSubmitSignin) btnSubmitSignin.disabled = true;
-        if (signinSpinner) signinSpinner.style.display = 'inline-block';
-        const user = await window.NetcradusAuth.signInEmailPassword(email, password);
-        updateUserProfileUI(user);
-        hideAuthOverlay();
-      } catch (err) {
-        console.error("Sign in failed:", err);
-        const errMsg = err.message || 'Failed to sign in. Please check your email and password.';
-        showAuthAlert(authAlert, errMsg);
-      } finally {
-        if (btnSubmitSignin) btnSubmitSignin.disabled = false;
-        if (signinSpinner) signinSpinner.style.display = 'none';
-      }
-    });
-  }
-
-  // Create Account Form Submission
-  if (formSignup) {
-    formSignup.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      hideAuthAlert(authAlert);
-
-      const name = signupName ? signupName.value.trim() : '';
-      const email = signupEmail ? signupEmail.value.trim() : '';
-      const password = signupPassword ? signupPassword.value : '';
-
-      if (!email || !password) {
-        showAuthAlert(authAlert, 'Please fill in all required fields.');
-        return;
-      }
-
-      try {
-        if (btnSubmitSignup) btnSubmitSignup.disabled = true;
-        if (signupSpinner) signupSpinner.style.display = 'inline-block';
-        const user = await window.NetcradusAuth.signUpEmailPassword(email, password, name);
-        updateUserProfileUI(user);
-        hideAuthOverlay();
-      } catch (err) {
-        console.error("Sign up failed:", err);
-        const errMsg = err.message || 'Failed to create account. Email may already be in use.';
-        showAuthAlert(authAlert, errMsg);
-      } finally {
-        if (btnSubmitSignup) btnSubmitSignup.disabled = false;
-        if (signupSpinner) signupSpinner.style.display = 'none';
-      }
-    });
-  }
-
-  // Google Sign In Button
-  if (btnGoogleSignin) {
-    btnGoogleSignin.addEventListener('click', async () => {
-      hideAuthAlert(authAlert);
-      try {
-        const user = await window.NetcradusAuth.signInWithGoogle();
-        updateUserProfileUI(user);
-        hideAuthOverlay();
-      } catch (err) {
-        console.error("Google sign in failed:", err);
-        showAuthAlert(authAlert, err.message || 'Google sign in canceled or failed.');
-      }
-    });
-  }
-
-  // Guest Mode Button
-  if (btnGuestMode) {
-    btnGuestMode.addEventListener('click', () => {
-      const guest = window.NetcradusAuth.continueAsGuest();
-      updateUserProfileUI(guest);
-      hideAuthOverlay();
-    });
-  }
-
-  // Password Reset Modal Controls
-  if (btnForgotPassword) {
-    btnForgotPassword.addEventListener('click', (e) => {
-      e.preventDefault();
-      if (resetPasswordBackdrop) resetPasswordBackdrop.style.display = 'flex';
-      hideAuthAlert(resetModalAlert);
-    });
-  }
-
-  if (btnCloseResetModal) {
-    btnCloseResetModal.addEventListener('click', () => {
-      if (resetPasswordBackdrop) resetPasswordBackdrop.style.display = 'none';
-    });
-  }
-
-  if (btnSendResetEmail) {
-    btnSendResetEmail.addEventListener('click', async () => {
-      const email = resetEmail ? resetEmail.value.trim() : '';
-      if (!email) {
-        showAuthAlert(resetModalAlert, 'Please enter your account email address.');
-        return;
-      }
-      try {
-        await window.NetcradusAuth.sendPasswordReset(email);
-        showAuthAlert(resetModalAlert, 'Password reset link sent! Check your email inbox.', 'success');
-        setTimeout(() => {
-          if (resetPasswordBackdrop) resetPasswordBackdrop.style.display = 'none';
-        }, 2500);
-      } catch (err) {
-        showAuthAlert(resetModalAlert, err.message || 'Failed to send reset email.');
-      }
-    });
-  }
-
-  // Log Out Controls
-  const handleLogout = async () => {
-    if (profileMenuDropdown) profileMenuDropdown.style.display = 'none';
-    if (settingsModalBackdrop) settingsModalBackdrop.style.display = 'none';
-    await window.NetcradusAuth.signOutUser();
-    showAuthOverlay();
-  };
-
-  if (btnMenuLogout) btnMenuLogout.addEventListener('click', handleLogout);
-  if (btnModalLogout) btnModalLogout.addEventListener('click', handleLogout);
-
-  // Initialize UI
-  renderHistoryList();
+  // Initialize UI & Theme
   applyTheme(currentTheme);
+  initDefaultUserProfileUI();
+  renderHistoryList();
+  renderCurrentSessionMessages();
 
-  // Profile Options Dropdown Toggle
-  const toggleProfileMenu = (e) => {
-    e.stopPropagation();
-    if (profileMenuDropdown) {
-      const isShown = profileMenuDropdown.style.display === 'block';
-      profileMenuDropdown.style.display = isShown ? 'none' : 'block';
-    }
-  };
-
-  if (userProfileTrigger) userProfileTrigger.addEventListener('click', toggleProfileMenu);
-  if (headerAvatarTrigger) headerAvatarTrigger.addEventListener('click', toggleProfileMenu);
-  if (btnSettings) btnSettings.addEventListener('click', toggleProfileMenu);
-
-  document.addEventListener('click', (e) => {
-    if (profileMenuDropdown && !profileMenuDropdown.contains(e.target) && !e.target.closest('#user-profile-trigger') && !e.target.closest('#header-avatar-trigger')) {
-      profileMenuDropdown.style.display = 'none';
-    }
-  });
-
-  // Settings Modal Controls
-  if (btnMenuSettings) {
-    btnMenuSettings.addEventListener('click', () => {
-      if (profileMenuDropdown) profileMenuDropdown.style.display = 'none';
-      if (settingsModalBackdrop) settingsModalBackdrop.style.display = 'flex';
-    });
-  }
-
-  if (btnCloseModal) {
-    btnCloseModal.addEventListener('click', () => {
-      if (settingsModalBackdrop) settingsModalBackdrop.style.display = 'none';
-    });
-  }
-
-  if (settingsModalBackdrop) {
-    settingsModalBackdrop.addEventListener('click', (e) => {
-      if (e.target === settingsModalBackdrop) {
-        settingsModalBackdrop.style.display = 'none';
-      }
-    });
-  }
-
-  // Clear History Actions
-  const handleClearHistory = () => {
-    clearAllHistory();
-  };
-
-  if (btnMenuClearHistory) btnMenuClearHistory.addEventListener('click', handleClearHistory);
-  if (btnSidebarClearHistory) btnSidebarClearHistory.addEventListener('click', handleClearHistory);
-  if (btnModalClearHistory) btnModalClearHistory.addEventListener('click', handleClearHistory);
-
-  function clearAllHistory() {
-    if (confirm('Are you sure you want to clear all chat history?')) {
-      sessions = {};
-      saveSessionsToStorage();
-      startNewSession();
-      if (profileMenuDropdown) profileMenuDropdown.style.display = 'none';
-      if (settingsModalBackdrop) settingsModalBackdrop.style.display = 'none';
-    }
-  }
-
-  // Theme Toggle Listener
-  if (btnThemeToggle) {
-    btnThemeToggle.addEventListener('click', () => {
-      currentTheme = currentTheme === 'light' ? 'dark' : 'light';
-      applyTheme(currentTheme);
-      localStorage.setItem('netcradus_theme', currentTheme);
-    });
-  }
-
+  // ---------------------------------------------------------------------------
+  // Theme Toggle Management
+  // ---------------------------------------------------------------------------
   function applyTheme(theme) {
-    if (theme === 'light') {
-      document.documentElement.setAttribute('data-theme', 'light');
-      if (themeIcon) themeIcon.textContent = '🌙';
-      if (themeText) themeText.textContent = 'Dark';
-    } else {
-      document.documentElement.setAttribute('data-theme', 'dark');
-      if (themeIcon) themeIcon.textContent = '☀️';
-      if (themeText) themeText.textContent = 'Light';
+    currentTheme = theme;
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('netcradus_theme', theme);
+    if (btnThemeToggle) {
+      btnThemeToggle.textContent = theme === 'dark' ? '☀️' : '🌙';
     }
   }
 
-  // Model Selector
-  if (modelSelector) {
+  function toggleTheme() {
+    applyTheme(currentTheme === 'light' ? 'dark' : 'light');
+  }
+
+  if (btnThemeToggle) btnThemeToggle.addEventListener('click', toggleTheme);
+  if (btnModalThemeLight) btnModalThemeLight.addEventListener('click', () => applyTheme('light'));
+  if (btnModalThemeDark) btnModalThemeDark.addEventListener('click', () => applyTheme('dark'));
+
+  // ---------------------------------------------------------------------------
+  // Persona Pills & Quick Cards Handler
+  // ---------------------------------------------------------------------------
+  function setPersona(persona) {
+    currentPersona = persona;
+
+    if (headerPersonaPills) {
+      headerPersonaPills.forEach(pill => {
+        pill.classList.toggle('active', pill.getAttribute('data-persona') === persona);
+      });
+    }
+
+    if (heroPersonaBtns) {
+      heroPersonaBtns.forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-persona') === persona);
+      });
+    }
+  }
+
+  if (headerPersonaPills) {
+    headerPersonaPills.forEach(pill => {
+      pill.addEventListener('click', () => {
+        setPersona(pill.getAttribute('data-persona'));
+      });
+    });
+  }
+
+  if (heroPersonaBtns) {
+    heroPersonaBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        setPersona(btn.getAttribute('data-persona'));
+      });
+    });
+  }
+
+  if (quickCards) {
+    quickCards.forEach(card => {
+      card.addEventListener('click', () => {
+        const prompt = card.getAttribute('data-prompt');
+        const persona = card.getAttribute('data-persona') || 'general';
+        setPersona(persona);
+        if (prompt) sendMessage(prompt);
+      });
+    });
+  }
+
+  // ---------------------------------------------------------------------------
+  // Model Selector Synchronization
+  // ---------------------------------------------------------------------------
+  if (modelSelector && modalModelSelect) {
     modelSelector.addEventListener('change', (e) => {
       selectedModel = e.target.value;
-      if (modalModelSelect) modalModelSelect.value = selectedModel;
+      modalModelSelect.value = selectedModel;
     });
-  }
 
-  if (modalModelSelect) {
     modalModelSelect.addEventListener('change', (e) => {
       selectedModel = e.target.value;
-      if (modelSelector) modelSelector.value = selectedModel;
+      modelSelector.value = selectedModel;
     });
   }
 
-  // Hero Category Selector
-  if (heroCategorySelect) {
-    heroCategorySelect.addEventListener('change', (e) => {
-      const cat = e.target.value;
-      if (cat === 'code') currentPersona = 'code';
-      else if (cat === 'cybersecurity' || cat === 'threats') currentPersona = 'reasoning';
-      else currentPersona = 'general';
-    });
+  // ---------------------------------------------------------------------------
+  // File Attachment Handler
+  // ---------------------------------------------------------------------------
+  function triggerFileUpload() {
+    if (fileUploadInput) fileUploadInput.click();
   }
 
-  // Sidebar Collapse / Expand
-  if (btnSidebarCollapse && btnSidebarExpand) {
-    btnSidebarCollapse.addEventListener('click', () => {
-      appContainer.classList.add('sidebar-collapsed');
-      btnSidebarExpand.style.display = 'flex';
-    });
-
-    btnSidebarExpand.addEventListener('click', () => {
-      appContainer.classList.remove('sidebar-collapsed');
-      btnSidebarExpand.style.display = 'none';
-    });
-  }
-
-  // Attachment & Voice Simulator
-  const handleAttachClick = () => { if (fileUploadInput) fileUploadInput.click(); };
-  if (btnAttach) btnAttach.addEventListener('click', handleAttachClick);
-  if (btnHeroAttach) btnHeroAttach.addEventListener('click', handleAttachClick);
+  if (btnAttach) btnAttach.addEventListener('click', triggerFileUpload);
+  if (btnHeroAttach) btnHeroAttach.addEventListener('click', triggerFileUpload);
 
   if (fileUploadInput) {
     fileUploadInput.addEventListener('change', (e) => {
-      if (e.target.files.length > 0) {
-        const filename = e.target.files[0].name;
-        if (heroChatInput) heroChatInput.value += ` [Attached: ${filename}] `;
-        if (chatInput) chatInput.value += ` [Attached: ${filename}] `;
-      }
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        attachedFile = {
+          name: file.name,
+          size: file.size,
+          content: evt.target.result
+        };
+        renderAttachmentPill();
+      };
+      reader.readAsText(file);
     });
   }
 
+  function renderAttachmentPill() {
+    if (!attachedFile) {
+      if (heroAttachmentPreview) heroAttachmentPreview.style.display = 'none';
+      if (bottomAttachmentPreview) bottomAttachmentPreview.style.display = 'none';
+      return;
+    }
+
+    const kbSize = (attachedFile.size / 1024).toFixed(1);
+    const html = `
+      <div class="file-attachment-pill">
+        <span>📄 ${escapeHtml(attachedFile.name)} (${kbSize} KB)</span>
+        <span class="remove-file" title="Remove File">✕</span>
+      </div>
+    `;
+
+    if (heroAttachmentPreview) {
+      heroAttachmentPreview.innerHTML = html;
+      heroAttachmentPreview.style.display = 'block';
+      const removeBtn = heroAttachmentPreview.querySelector('.remove-file');
+      if (removeBtn) removeBtn.onclick = clearAttachment;
+    }
+
+    if (bottomAttachmentPreview) {
+      bottomAttachmentPreview.innerHTML = html;
+      bottomAttachmentPreview.style.display = 'block';
+      const removeBtn = bottomAttachmentPreview.querySelector('.remove-file');
+      if (removeBtn) removeBtn.onclick = clearAttachment;
+    }
+  }
+
+  function clearAttachment() {
+    attachedFile = null;
+    if (fileUploadInput) fileUploadInput.value = '';
+    renderAttachmentPill();
+  }
+
+  // ---------------------------------------------------------------------------
+  // Voice Input (Speech Recognition)
+  // ---------------------------------------------------------------------------
   if (btnMic) {
-    btnMic.addEventListener('click', () => {
-      btnMic.classList.toggle('active-mic');
-      if (btnMic.classList.contains('active-mic')) {
-        chatInput.placeholder = "Listening... Speak your prompt...";
-      } else {
-        chatInput.placeholder = "Ask Netcradus LLM anything...";
-      }
-    });
-  }
+    const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (SpeechRec) {
+      speechRecognition = new SpeechRec();
+      speechRecognition.continuous = false;
+      speechRecognition.interimResults = false;
+      speechRecognition.lang = 'en-US';
 
-  // Textarea Listeners
-  if (chatInput) {
-    chatInput.addEventListener('input', () => {
-      chatInput.style.height = 'auto';
-      chatInput.style.height = Math.min(chatInput.scrollHeight, 180) + 'px';
-    });
+      speechRecognition.onstart = () => {
+        isRecording = true;
+        btnMic.classList.add('recording');
+        btnMic.title = 'Listening... Speak now';
+      };
 
-    chatInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        sendMessage();
-      }
-    });
-  }
-
-  if (heroChatInput) {
-    heroChatInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && !e.shiftKey) {
-        e.preventDefault();
-        const text = heroChatInput.value.trim();
-        if (text) {
-          heroChatInput.value = '';
-          sendMessage(text);
+      speechRecognition.onresult = (evt) => {
+        const transcript = evt.results[0][0].transcript;
+        const activeInput = heroSection && heroSection.style.display !== 'none' ? heroChatInput : chatInput;
+        if (activeInput) {
+          activeInput.value = activeInput.value ? `${activeInput.value} ${transcript}` : transcript;
+          activeInput.focus();
         }
-      }
-    });
-  }
+      };
 
-  if (btnHeroSend) {
-    btnHeroSend.addEventListener('click', () => {
-      if (heroChatInput) {
-        const text = heroChatInput.value.trim();
-        if (text) {
-          heroChatInput.value = '';
-          sendMessage(text);
+      speechRecognition.onerror = (evt) => {
+        console.warn('Speech recognition error:', evt.error);
+        stopRecording();
+      };
+
+      speechRecognition.onend = () => {
+        stopRecording();
+      };
+
+      btnMic.addEventListener('click', () => {
+        if (isRecording) {
+          speechRecognition.stop();
+        } else {
+          speechRecognition.start();
         }
-      }
-    });
+      });
+    } else {
+      btnMic.title = 'Voice input not supported in this browser';
+    }
   }
 
-  if (btnSend) btnSend.addEventListener('click', () => sendMessage());
-  if (btnStop) btnStop.addEventListener('click', stopGeneration);
-  if (btnNewChat) btnNewChat.addEventListener('click', () => startNewSession());
-  if (btnClearChat) btnClearChat.addEventListener('click', () => clearCurrentSession());
+  function stopRecording() {
+    isRecording = false;
+    if (btnMic) {
+      btnMic.classList.remove('recording');
+      btnMic.title = 'Voice Input';
+    }
+  }
 
-  // Session Storage Helpers
+  // ---------------------------------------------------------------------------
+  // Session & Local Storage Management
+  // ---------------------------------------------------------------------------
   function loadSessionsFromStorage() {
     try {
-      const data = localStorage.getItem('netcradus_sessions');
-      return data ? JSON.parse(data) : {};
-    } catch {
+      const saved = localStorage.getItem('netcradus_sessions');
+      return saved ? JSON.parse(saved) : {};
+    } catch (e) {
       return {};
     }
   }
 
   function saveSessionsToStorage() {
-    try {
-      localStorage.setItem('netcradus_sessions', JSON.stringify(sessions));
-    } catch (e) {
-      console.warn('LocalStorage save error:', e);
-    }
+    localStorage.setItem('netcradus_sessions', JSON.stringify(sessions));
   }
 
   function createNewSession() {
-    const id = 'session_' + Date.now();
+    const id = 'sess_' + Date.now() + '_' + Math.random().toString(36).substring(2, 7);
     sessions[id] = {
       id: id,
       title: 'New Conversation',
@@ -533,6 +326,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function startNewSession() {
     if (isGenerating) stopGeneration();
     currentSessionId = createNewSession();
+    clearAttachment();
     renderCurrentSessionMessages();
     renderHistoryList();
   }
@@ -543,10 +337,42 @@ document.addEventListener('DOMContentLoaded', () => {
       sessions[currentSessionId].messages = [];
       saveSessionsToStorage();
     }
+    clearAttachment();
     renderCurrentSessionMessages();
   }
 
+  function clearAllHistory() {
+    if (confirm('Are you sure you want to clear all chat history? This action cannot be undone.')) {
+      if (isGenerating) stopGeneration();
+      sessions = {};
+      localStorage.removeItem('netcradus_sessions');
+      currentSessionId = createNewSession();
+      clearAttachment();
+      renderCurrentSessionMessages();
+      renderHistoryList();
+      if (profileMenuDropdown) profileMenuDropdown.style.display = 'none';
+    }
+  }
+
+  function handleLogout() {
+    if (confirm('Are you sure you want to log out?')) {
+      if (isGenerating) stopGeneration();
+      localStorage.removeItem('netcradus_user');
+      localStorage.removeItem('netcradus_sessions');
+      sessions = {};
+      currentSessionId = createNewSession();
+      clearAttachment();
+      renderCurrentSessionMessages();
+      renderHistoryList();
+      if (profileMenuDropdown) profileMenuDropdown.style.display = 'none';
+      if (settingsModalBackdrop) settingsModalBackdrop.style.display = 'none';
+      initDefaultUserProfileUI();
+      alert('You have been logged out successfully.');
+    }
+  }
+
   function renderHistoryList() {
+    if (!historyList) return;
     historyList.innerHTML = '';
     const sorted = Object.values(sessions).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
@@ -577,6 +403,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function switchSession(id) {
     if (isGenerating) stopGeneration();
     currentSessionId = id;
+    clearAttachment();
     renderCurrentSessionMessages();
     renderHistoryList();
   }
@@ -593,49 +420,76 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function renderCurrentSessionMessages() {
+    if (!messagesWrapper) return;
     messagesWrapper.innerHTML = '';
     const sess = sessions[currentSessionId];
+
     if (!sess || sess.messages.length === 0) {
-      messagesWrapper.appendChild(heroSection);
-      heroSection.style.display = 'block';
+      if (heroSection) {
+        messagesWrapper.appendChild(heroSection);
+        heroSection.style.display = 'flex';
+        heroSection.style.flexDirection = 'column';
+      }
       if (bottomInputContainer) bottomInputContainer.style.display = 'none';
       return;
     }
 
-    heroSection.style.display = 'none';
+    if (heroSection) heroSection.style.display = 'none';
     if (bottomInputContainer) bottomInputContainer.style.display = 'flex';
+
     sess.messages.forEach((msg) => {
       appendMessageRowUI(msg.role, msg.content, msg.metrics);
     });
     scrollToBottom();
   }
 
+  // ---------------------------------------------------------------------------
   // Send Message & Stream Response
+  // ---------------------------------------------------------------------------
   async function sendMessage(overrideText = null) {
-    const text = overrideText || (chatInput ? chatInput.value.trim() : '');
-    if (!text || isGenerating) return;
+    let text = overrideText;
+    if (!text) {
+      if (heroSection && heroSection.style.display !== 'none' && heroChatInput) {
+        text = heroChatInput.value.trim();
+      } else if (chatInput) {
+        text = chatInput.value.trim();
+      }
+    }
+
+    if ((!text && !attachedFile) || isGenerating) return;
+
+    // If file is attached, append file content to prompt
+    let fullPromptText = text || '';
+    if (attachedFile) {
+      fullPromptText += `\n\n[Attached File: ${attachedFile.name}]\n\`\`\`\n${attachedFile.content}\n\`\`\``;
+    }
 
     const sess = sessions[currentSessionId];
     if (!sess) return;
 
     if (sess.messages.length === 0) {
-      sess.title = text.length > 28 ? text.substring(0, 28) + '...' : text;
+      sess.title = text.length > 28 ? text.substring(0, 28) + '...' : (attachedFile ? attachedFile.name : 'New Chat');
     }
 
-    heroSection.style.display = 'none';
+    if (heroSection) heroSection.style.display = 'none';
     if (bottomInputContainer) bottomInputContainer.style.display = 'flex';
 
     // Append User Message
-    sess.messages.push({ role: 'user', content: text });
-    appendMessageRowUI('user', text);
+    sess.messages.push({ role: 'user', content: fullPromptText });
+    appendMessageRowUI('user', fullPromptText);
     saveSessionsToStorage();
     renderHistoryList();
 
-    // Reset Input
+    // Reset Inputs & Clear Attachment
+    if (heroChatInput) {
+      heroChatInput.value = '';
+      heroChatInput.style.height = 'auto';
+    }
     if (chatInput) {
       chatInput.value = '';
       chatInput.style.height = 'auto';
     }
+    clearAttachment();
 
     // Prepare AI UI Row
     const aiRow = appendMessageRowUI('assistant', '');
@@ -648,7 +502,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (btnStop) btnStop.style.display = 'flex';
     abortController = new AbortController();
 
-    let fullText = '';
+    let fullResponseText = '';
 
     try {
       const response = await fetch('/api/chat/stream', {
@@ -658,7 +512,8 @@ document.addEventListener('DOMContentLoaded', () => {
         body: JSON.stringify({
           messages: sess.messages,
           persona: currentPersona,
-          model: selectedModel
+          model: selectedModel,
+          user: { uid: 'usr_local', name: 'Netcradus User' }
         })
       });
 
@@ -684,8 +539,8 @@ document.addEventListener('DOMContentLoaded', () => {
             try {
               const data = JSON.parse(dataStr);
               if (data.chunk) {
-                fullText += data.chunk;
-                bubble.innerHTML = formatMarkdown(fullText);
+                fullResponseText += data.chunk;
+                bubble.innerHTML = formatMarkdown(fullResponseText);
                 attachCopyCodeListeners(bubble);
                 scrollToBottom();
               }
@@ -698,9 +553,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     <button class="btn-action btn-thumb btn-thumb-down" title="Bad Response">👎</button>
                     <button class="btn-action btn-regen" title="Regenerate">🔄 Regenerate</button>
                   </div>
-                  <span class="time-badge">${m.time_sec}s</span>
+                  <span class="time-badge">${m.time_sec}s (${m.tok_per_sec} tok/s)</span>
                 `;
-                attachMessageActions(aiRow, fullText, text);
+                attachMessageActions(aiRow, fullResponseText, text);
               }
             } catch (e) {
               console.warn('JSON stream parse error:', e);
@@ -709,15 +564,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
 
-      // Save to session history
-      sess.messages.push({ role: 'assistant', content: fullText });
+      sess.messages.push({ role: 'assistant', content: fullResponseText });
       saveSessionsToStorage();
 
     } catch (err) {
       if (err.name === 'AbortError') {
         bubble.innerHTML += `<br><em style="color: var(--text-dim); font-size: 0.85rem;">[Generation Stopped]</em>`;
       } else {
-        bubble.innerHTML = `<span style="color: #ef4444;">⚠️ Error communicating with Netcradus LLM: ${err.message}</span>`;
+        bubble.innerHTML = `<span style="color: #ef4444;">⚠️ Error communicating with Netcradus LLM backend (${err.message}). Please ensure web_server.py is running.</span>`;
       }
     } finally {
       isGenerating = false;
@@ -733,7 +587,44 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Append Message Row UI
+  // ---------------------------------------------------------------------------
+  // Key Listeners for Inputs
+  // ---------------------------------------------------------------------------
+  if (btnHeroSend) btnHeroSend.addEventListener('click', () => sendMessage());
+  if (btnSend) btnSend.addEventListener('click', () => sendMessage());
+  if (btnStop) btnStop.addEventListener('click', stopGeneration);
+
+  if (heroChatInput) {
+    heroChatInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+  }
+
+  if (chatInput) {
+    chatInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+  }
+
+  // Auto-resize chat textarea
+  const autoResizeTextarea = (elem) => {
+    if (!elem) return;
+    elem.style.height = 'auto';
+    elem.style.height = Math.min(elem.scrollHeight, 180) + 'px';
+  };
+
+  if (heroChatInput) heroChatInput.addEventListener('input', () => autoResizeTextarea(heroChatInput));
+  if (chatInput) chatInput.addEventListener('input', () => autoResizeTextarea(chatInput));
+
+  // ---------------------------------------------------------------------------
+  // Message UI Row Builder & Action Listeners
+  // ---------------------------------------------------------------------------
   function appendMessageRowUI(role, content, metrics = null) {
     const row = document.createElement('div');
     row.className = `message-row ${role}`;
@@ -772,7 +663,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     row.appendChild(avatar);
     row.appendChild(wrapper);
-    messagesWrapper.appendChild(row);
+    if (messagesWrapper) messagesWrapper.appendChild(row);
 
     scrollToBottom();
     return row;
@@ -814,8 +705,8 @@ document.addEventListener('DOMContentLoaded', () => {
       regenBtn.addEventListener('click', () => {
         const sess = sessions[currentSessionId];
         if (sess && sess.messages.length >= 2) {
-          sess.messages.pop();
-          const lastUser = sess.messages.pop();
+          sess.messages.pop(); // Pop assistant msg
+          const lastUser = sess.messages.pop(); // Pop user msg
           saveSessionsToStorage();
           renderCurrentSessionMessages();
           sendMessage(lastUser.content);
@@ -824,16 +715,32 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Full Markdown Renderer
+  // ---------------------------------------------------------------------------
+  // Markdown & Reasoning Details Renderer
+  // ---------------------------------------------------------------------------
   function formatMarkdown(text) {
     if (!text) return '';
 
-    let formatted = text
+    // Separate collapsible reasoning blocks first to protect their HTML tags
+    const reasoningBlocks = [];
+    let processed = text.replace(/<details class='reasoning-block'>[\s\S]*?<\/details>/gi, (match) => {
+      reasoningBlocks.push(match);
+      return `___REASONING_BLOCK_${reasoningBlocks.length - 1}___`;
+    });
+
+    // Escape raw unsafe HTML
+    processed = processed
       .replace(/&/g, "&amp;")
       .replace(/</g, "&lt;")
       .replace(/>/g, "&gt;");
 
-    formatted = formatted.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
+    // Re-insert protected reasoning HTML blocks
+    reasoningBlocks.forEach((block, idx) => {
+      processed = processed.replace(`___REASONING_BLOCK_${idx}___`, block);
+    });
+
+    // Code Blocks parser
+    processed = processed.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
       const language = (lang || 'code').toUpperCase();
       return `
         <div class="code-wrapper">
@@ -846,13 +753,15 @@ document.addEventListener('DOMContentLoaded', () => {
       `;
     });
 
-    formatted = formatted.replace(/`([^`]+)`/g, '<code>$1</code>');
-    formatted = formatted.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-    formatted = formatted.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+    // Inline formatting: code, bold, italics
+    processed = processed.replace(/`([^`]+)`/g, '<code>$1</code>');
+    processed = processed.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    processed = processed.replace(/\*([^*]+)\*/g, '<em>$1</em>');
 
-    const parts = formatted.split(/(<div class="code-wrapper">[\s\S]*?<\/div>)/g);
+    // Paragraph line breaks outside code blocks and details blocks
+    const parts = processed.split(/(<div class="code-wrapper">[\s\S]*?<\/div>|<details class='reasoning-block'>[\s\S]*?<\/details>)/g);
     for (let i = 0; i < parts.length; i++) {
-      if (!parts[i].startsWith('<div class="code-wrapper">')) {
+      if (!parts[i].startsWith('<div class="code-wrapper">') && !parts[i].startsWith('<details class=\'reasoning-block\'>')) {
         parts[i] = parts[i].replace(/\n/g, '<br>');
       }
     }
@@ -876,10 +785,92 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function scrollToBottom() {
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    if (messagesContainer) {
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
   }
 
   function escapeHtml(str) {
     return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  // ---------------------------------------------------------------------------
+  // Sidebar Collapse, New Chat & Modals Handlers
+  // ---------------------------------------------------------------------------
+  if (btnSidebarCollapse && sidebar && btnSidebarExpand) {
+    btnSidebarCollapse.addEventListener('click', () => {
+      sidebar.classList.add('collapsed');
+      btnSidebarExpand.style.display = 'flex';
+    });
+
+    btnSidebarExpand.addEventListener('click', () => {
+      sidebar.classList.remove('collapsed');
+      btnSidebarExpand.style.display = 'none';
+    });
+  }
+
+  if (btnNewChat) btnNewChat.addEventListener('click', startNewSession);
+  if (btnClearChat) btnClearChat.addEventListener('click', clearCurrentSession);
+  if (btnSidebarClearHistory) btnSidebarClearHistory.addEventListener('click', clearAllHistory);
+  if (btnMenuClearHistory) btnMenuClearHistory.addEventListener('click', clearAllHistory);
+  if (btnMenuLogout) btnMenuLogout.addEventListener('click', handleLogout);
+  if (btnModalLogout) btnModalLogout.addEventListener('click', handleLogout);
+
+  // Settings Modal Controls
+  if (btnSettings && settingsModalBackdrop) {
+    btnSettings.addEventListener('click', () => {
+      settingsModalBackdrop.style.display = 'flex';
+    });
+  }
+
+  if (btnMenuSettings && settingsModalBackdrop) {
+    btnMenuSettings.addEventListener('click', () => {
+      if (profileMenuDropdown) profileMenuDropdown.style.display = 'none';
+      settingsModalBackdrop.style.display = 'flex';
+    });
+  }
+
+  if (btnCloseModal && settingsModalBackdrop) {
+    btnCloseModal.addEventListener('click', () => {
+      settingsModalBackdrop.style.display = 'none';
+    });
+  }
+
+  // Profile Popup Dropdown Toggle
+  const toggleProfileMenu = (e) => {
+    e.stopPropagation();
+    if (profileMenuDropdown) {
+      const isVisible = profileMenuDropdown.style.display === 'block';
+      profileMenuDropdown.style.display = isVisible ? 'none' : 'block';
+    }
+  };
+
+  if (userProfileTrigger) userProfileTrigger.addEventListener('click', toggleProfileMenu);
+  if (headerAvatarTrigger) headerAvatarTrigger.addEventListener('click', toggleProfileMenu);
+
+  document.addEventListener('click', (e) => {
+    if (profileMenuDropdown && !profileMenuDropdown.contains(e.target) && e.target !== userProfileTrigger && e.target !== headerAvatarTrigger) {
+      profileMenuDropdown.style.display = 'none';
+    }
+  });
+
+  // Default User Profile UI Setup
+  function initDefaultUserProfileUI() {
+    const displayName = 'Netcradus User';
+    const email = 'user@netcradus.ai';
+    const initial = 'N';
+    const providerLabel = 'Pro Plan';
+
+    if (sidebarUserAvatar) sidebarUserAvatar.textContent = initial;
+    if (headerAvatarTrigger) headerAvatarTrigger.textContent = initial;
+    if (modalUserAvatar) modalUserAvatar.textContent = initial;
+    if (sidebarUserName) sidebarUserName.textContent = displayName;
+    if (sidebarUserPlan) sidebarUserPlan.textContent = providerLabel;
+    if (dropdownUserName) dropdownUserName.textContent = displayName;
+    if (dropdownUserBadge) dropdownUserBadge.textContent = providerLabel;
+    if (dropdownUserEmail) dropdownUserEmail.textContent = email;
+    if (modalUserName) modalUserName.textContent = displayName;
+    if (modalUserEmail) modalUserEmail.textContent = email;
+    if (modalUserProvider) modalUserProvider.textContent = `Status: Active (${providerLabel})`;
   }
 });
