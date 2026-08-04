@@ -1,6 +1,7 @@
 import os
 import time
 import math
+import threading
 # pyrefly: ignore [missing-import]
 import torch
 # pyrefly: ignore [missing-import]
@@ -30,7 +31,8 @@ class NetcradusTrainer:
         max_steps: int = 100,
         gradient_clip: float = 1.0,
         output_dir: str = "./checkpoints",
-        device: str = "cpu"
+        device: str = "cpu",
+        stop_event: Optional[threading.Event] = None
     ):
         self.model = model.to(device)
         self.train_dataloader = train_dataloader
@@ -42,6 +44,12 @@ class NetcradusTrainer:
         self.gradient_clip = gradient_clip
         self.output_dir = output_dir
         self.device = device
+        self.stop_event = stop_event
+
+        # Shared progress state (read by admin training-status polling)
+        self.current_step = 0
+        self.last_loss = 0.0
+        self.tokens_per_sec = 0.0
 
         os.makedirs(self.output_dir, exist_ok=True)
 
@@ -85,6 +93,10 @@ class NetcradusTrainer:
 
         train_iter = iter(self.train_dataloader)
         while step < self.max_steps:
+            if self.stop_event is not None and self.stop_event.is_set():
+                print("[NetcradusTrainer] Stop signal received. Halting training loop.")
+                break
+
             try:
                 batch = next(train_iter)
             except StopIteration:
@@ -109,6 +121,12 @@ class NetcradusTrainer:
 
             total_loss += loss.item()
             step += 1
+
+            # Publish shared progress state
+            self.current_step = step
+            self.last_loss = loss.item()
+            elapsed_now = max(0.001, time.time() - start_time)
+            self.tokens_per_sec = (step * input_ids.shape[0] * input_ids.shape[1]) / elapsed_now
 
             if step % 10 == 0 or step == self.max_steps:
                 avg_loss = total_loss / step

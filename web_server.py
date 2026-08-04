@@ -49,6 +49,7 @@ import json
 import time
 import argparse
 import logging
+import threading
 from pathlib import Path
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from socketserver import ThreadingMixIn
@@ -59,11 +60,22 @@ PROJECT_ROOT = str(Path(__file__).resolve().parent)
 if PROJECT_ROOT not in sys.path:
     sys.path.insert(0, PROJECT_ROOT)
 
+# When executed as `python web_server.py`, this file is the "__main__" module.
+# admin_api / user_api reach the live pipeline via `import web_server`; without
+# this shim, that import re-executes this file as a second module with
+# PIPELINE=None, so the Admin LLM panel and user chat never see the real model.
+# Alias the running instance under the importable name so all references agree.
+if "web_server" not in sys.modules:
+    sys.modules["web_server"] = sys.modules[__name__]
+
 import torch
 from netcradus_llm.config import NetcradusConfig
 from netcradus_llm.model import NetcradusForCausalLM
 from netcradus_llm.tokenizer import NetcradusTokenizer
 from netcradus_llm.inference import NetcradusPipeline
+from admin import AdminAPI
+from user_panel import UserAPI
+from training_panel import TrainingAPI
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(name)s: %(message)s")
 logger = logging.getLogger("web_server")
@@ -72,6 +84,25 @@ logger = logging.getLogger("web_server")
 PIPELINE: Optional[NetcradusPipeline] = None
 DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 WEB_DIR = os.path.join(PROJECT_ROOT, "web")
+
+# LLM initialization lifecycle state, visible to request handlers while the
+# model loads asynchronously in a background thread:
+#   "pending"  -> not started yet
+#   "loading"  -> background thread initializing the pipeline
+#   "ready"    -> PIPELINE is populated and ready for inference
+#   "error"    -> initialization failed; server stays up in fallback mode
+LLM_STATE = "pending"
+LLM_STATE_LOCK = threading.Lock()
+LLM_ERROR: Optional[str] = None
+
+# Admin panel backend (auth, dashboards, users, LLM, training, logs)
+ADMIN = AdminAPI()
+
+# User panel backend (auth, profile, chat, settings)
+USER = UserAPI()
+
+# Training panel backend (datasets, training control, checkpoints, logs)
+TRAINING = TrainingAPI()
 
 PERSONA_SYSTEM_PROMPTS = {
     "general": "You are Netcradus LLM, a helpful, intelligent, and precise AI assistant.",
@@ -119,42 +150,132 @@ class NetcradusHTTPRequestHandler(BaseHTTPRequestHandler):
         self.wfile.write(content)
 
     def do_GET(self):
-        """Handle GET requests for static files & status API."""
+        """Handle GET requests for static files, admin pages & status API."""
         clean_path = self.path.split("?")[0].lstrip("/")
-        
+        ADMIN.count_request()
+
+        # ---- Admin static files ----
+        if clean_path in ("admin", "admin.html"):
+            self.send_file_response(os.path.join(WEB_DIR, "admin.html"), "text/html; charset=utf-8")
+            return
+        if clean_path == "admin.css":
+            self.send_file_response(os.path.join(WEB_DIR, "admin.css"), "text/css; charset=utf-8")
+            return
+        if clean_path == "admin.js":
+            self.send_file_response(os.path.join(WEB_DIR, "admin.js"), "application/javascript; charset=utf-8")
+            return
+
+        # ---- User panel static files ----
+        if clean_path in ("user", "user.html"):
+            self.send_file_response(os.path.join(WEB_DIR, "user.html"), "text/html; charset=utf-8")
+            return
+        if clean_path == "user.css":
+            self.send_file_response(os.path.join(WEB_DIR, "user.css"), "text/css; charset=utf-8")
+            return
+        if clean_path == "user.js":
+            self.send_file_response(os.path.join(WEB_DIR, "user.js"), "application/javascript; charset=utf-8")
+            return
+
+        # ---- Training panel static files ----
+        if clean_path in ("training", "training.html"):
+            self.send_file_response(os.path.join(WEB_DIR, "training.html"), "text/html; charset=utf-8")
+            return
+        if clean_path == "training.css":
+            self.send_file_response(os.path.join(WEB_DIR, "training.css"), "text/css; charset=utf-8")
+            return
+        if clean_path == "training.js":
+            self.send_file_response(os.path.join(WEB_DIR, "training.js"), "application/javascript; charset=utf-8")
+            return
+
+        # ---- Existing routes ----
         if not clean_path or clean_path == "index.html":
             self.send_file_response(os.path.join(WEB_DIR, "index.html"), "text/html; charset=utf-8")
         elif clean_path == "api/status":
+            with LLM_STATE_LOCK:
+                llm_state = LLM_STATE
+                llm_error = LLM_ERROR
             status_data = {
                 "status": "online",
                 "model_name": "Netcradus LLM v1.0",
                 "vocab_size": PIPELINE.tokenizer.vocab_size if PIPELINE else 32000,
                 "device": DEVICE,
                 "architecture": "SwiGLU + GQA + RoPE (256k context)",
+                "model_loaded": PIPELINE is not None,
+                "llm_state": llm_state,
+                "llm_error": llm_error,
             }
             self.send_json_response(status_data)
+            return
+        # ---- Chat API (GET): returns endpoint usage info. The actual chat
+        #      completion is POST /api/chat | POST /api/chat/stream. ----
+        elif clean_path in ("api/chat", "api/chat/stream"):
+            with LLM_STATE_LOCK:
+                llm_state = LLM_STATE
+            self.send_json_response({
+                "status": "ok",
+                "model_loaded": PIPELINE is not None,
+                "llm_state": llm_state,
+                "endpoints": {
+                    "POST /api/chat": "Non-streaming chat completion.",
+                    "POST /api/chat/stream": "Server-Sent Events token stream.",
+                },
+                "usage": {
+                    "messages": [{"role": "user", "content": "..."}],
+                    "persona": "general",
+                    "max_new_tokens": 512,
+                    "temperature": 0.7,
+                },
+            })
+            return
+        # ---- Training API routes (GET) ----
+        if clean_path.startswith("api/training/"):
+            self._handle_training_api("GET")
+            return
+        # ---- User API routes (GET) ----
+        if clean_path.startswith("api/user/"):
+            self._handle_user_api("GET")
+            return
+        # ---- Admin API routes (GET) ----
+        if clean_path.startswith("api/"):
+            self._handle_admin_api("GET")
+            return
+
+        # ---- Existing static file fallback ----
+        filepath = os.path.join(WEB_DIR, clean_path)
+        if os.path.isfile(filepath):
+            ext = os.path.splitext(filepath)[1].lower()
+            content_types = {
+                ".css": "text/css; charset=utf-8",
+                ".js": "application/javascript; charset=utf-8",
+                ".png": "image/png",
+                ".jpg": "image/jpeg",
+                ".jpeg": "image/jpeg",
+                ".svg": "image/svg+xml",
+                ".ico": "image/x-icon",
+                ".html": "text/html; charset=utf-8"
+            }
+            content_type = content_types.get(ext, "application/octet-stream")
+            self.send_file_response(filepath, content_type)
         else:
-            filepath = os.path.join(WEB_DIR, clean_path)
-            if os.path.isfile(filepath):
-                ext = os.path.splitext(filepath)[1].lower()
-                content_types = {
-                    ".css": "text/css; charset=utf-8",
-                    ".js": "application/javascript; charset=utf-8",
-                    ".png": "image/png",
-                    ".jpg": "image/jpeg",
-                    ".jpeg": "image/jpeg",
-                    ".svg": "image/svg+xml",
-                    ".ico": "image/x-icon",
-                    ".html": "text/html; charset=utf-8"
-                }
-                content_type = content_types.get(ext, "application/octet-stream")
-                self.send_file_response(filepath, content_type)
-            else:
-                self.send_error(404, "Page Not Found")
+            self.send_error(404, "Page Not Found")
 
     def do_POST(self):
-        """Handle POST requests for /api/chat & /api/chat/stream endpoints."""
-        if self.path in ("/api/chat", "/api/chat/stream"):
+        """Handle POST requests for user APIs, chat, chat/stream & admin APIs."""
+        clean_path = self.path.split("?")[0].lstrip("/")
+
+        # ---- User API routes (POST) ----
+        if clean_path.startswith("api/user/"):
+            self._handle_user_api("POST")
+            return
+
+        # ---- Training API routes (POST) ----
+        if clean_path.startswith("api/training/"):
+            self._handle_training_api("POST")
+            return
+
+        # ---- Chat endpoints (checked before the admin `api/` catch-all so the
+        #      chat routes are reachable) ----
+        if clean_path in ("api/chat", "api/chat/stream"):
             content_length = int(self.headers.get("Content-Length", 0))
             body_bytes = self.rfile.read(content_length)
 
@@ -166,8 +287,8 @@ class NetcradusHTTPRequestHandler(BaseHTTPRequestHandler):
 
             messages = payload.get("messages", [])
             persona = payload.get("persona", "general")
-            temperature = float(payload.get("temperature", 0.7))
-            max_new_tokens = int(payload.get("max_new_tokens", 512))
+            temperature = float(payload.get("temperature", ADMIN.get_setting("default_temperature", 0.7)))
+            max_new_tokens = int(payload.get("max_new_tokens", ADMIN.get_setting("default_max_tokens", 512)))
 
             if not messages:
                 self.send_json_response({"error": "No messages provided"}, 400)
@@ -178,15 +299,12 @@ class NetcradusHTTPRequestHandler(BaseHTTPRequestHandler):
             user_str = f" [User: {user_info.get('name', 'Anonymous')} ({user_info.get('uid', 'guest')})]" if user_info else ""
             logger.info(f"Query: '{last_user_msg}' [Persona: {persona}, Temp: {temperature}, MaxTokens: {max_new_tokens}]{user_str}")
 
-            # Prepend system prompt for persona if not present
             system_prompt = PERSONA_SYSTEM_PROMPTS.get(persona, PERSONA_SYSTEM_PROMPTS["general"])
             formatted_messages = [{"role": "system", "content": system_prompt}] + messages
 
-            # Determine response text
             full_response = get_llm_response(formatted_messages, last_user_msg, persona, max_new_tokens, temperature)
 
-            if self.path == "/api/chat/stream":
-                # Stream token response using Server-Sent Events (SSE)
+            if clean_path == "api/chat/stream":
                 self.send_response(200)
                 self.send_header("Content-Type", "text/event-stream")
                 self.send_header("Cache-Control", "no-cache")
@@ -223,6 +341,11 @@ class NetcradusHTTPRequestHandler(BaseHTTPRequestHandler):
                 })
                 self.wfile.write(f"data: {final_event}\n\n".encode("utf-8"))
                 self.wfile.flush()
+                # Signal end-of-stream by closing the connection. With HTTP/1.1
+                # keep-alive on, BaseHTTPRequestHandler would otherwise keep the
+                # socket open after the final event, causing SSE clients (and
+                # `curl`) to hang until a timeout.
+                self.close_connection = True
             else:
                 self.send_json_response({
                     "response": full_response,
@@ -230,16 +353,95 @@ class NetcradusHTTPRequestHandler(BaseHTTPRequestHandler):
                     "persona": persona,
                     "device": DEVICE
                 })
-        else:
-            self.send_error(404, "API Endpoint Not Found")
+            return
+
+        # ---- Admin API routes (POST) ----
+        if clean_path.startswith("api/"):
+            self._handle_admin_api("POST")
+            return
+
+        self.send_error(404, "API Endpoint Not Found")
 
     def do_OPTIONS(self):
         """Handle CORS pre-flight requests."""
         self.send_response(200)
         self.send_header("Access-Control-Allow-Origin", "*")
-        self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
-        self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+        self.send_header("Access-Control-Allow-Headers", "Content-Type, Authorization")
         self.end_headers()
+
+    def do_PUT(self):
+        """Handle PUT requests for user, training & admin APIs."""
+        clean_path = self.path.split("?")[0].lstrip("/")
+        if clean_path.startswith("api/training/"):
+            self._handle_training_api("PUT")
+            return
+        if clean_path.startswith("api/user/"):
+            self._handle_user_api("PUT")
+            return
+        self._handle_admin_api("PUT")
+
+    def do_DELETE(self):
+        """Handle DELETE requests for user, training & admin APIs."""
+        clean_path = self.path.split("?")[0].lstrip("/")
+        if clean_path.startswith("api/training/"):
+            self._handle_training_api("DELETE")
+            return
+        if clean_path.startswith("api/user/"):
+            self._handle_user_api("DELETE")
+            return
+        self._handle_admin_api("DELETE")
+
+    def _handle_admin_api(self, method: str):
+        """Route /api/* requests to the admin backend."""
+        clean_path = self.path.split("?")[0].lstrip("/")
+        body = None
+        if method in ("POST", "PUT"):
+            try:
+                content_length = int(self.headers.get("Content-Length", 0))
+                body_bytes = self.rfile.read(content_length) if content_length else b""
+                if body_bytes:
+                    body = json.loads(body_bytes.decode("utf-8"))
+            except json.JSONDecodeError:
+                self.send_json_response({"error": "Invalid JSON payload"}, 400)
+                return
+
+        status, data = ADMIN.handle(method, clean_path, body, dict(self.headers))
+        self.send_json_response(data, status_code=status)
+
+    def _handle_user_api(self, method: str):
+        """Route /api/user/* requests to the user backend."""
+        clean_path = self.path.split("?")[0].lstrip("/")
+        body = None
+        if method in ("POST", "PUT"):
+            try:
+                content_length = int(self.headers.get("Content-Length", 0))
+                body_bytes = self.rfile.read(content_length) if content_length else b""
+                if body_bytes:
+                    body = json.loads(body_bytes.decode("utf-8"))
+            except json.JSONDecodeError:
+                self.send_json_response({"error": "Invalid JSON payload"}, 400)
+                return
+
+        status, data = USER.handle(method, clean_path, body, dict(self.headers))
+        self.send_json_response(data, status_code=status)
+
+    def _handle_training_api(self, method: str):
+        """Route /api/training/* requests to the training backend."""
+        clean_path = self.path.split("?")[0].lstrip("/")
+        body = None
+        if method in ("POST", "PUT"):
+            try:
+                content_length = int(self.headers.get("Content-Length", 0))
+                body_bytes = self.rfile.read(content_length) if content_length else b""
+                if body_bytes:
+                    body = json.loads(body_bytes.decode("utf-8"))
+            except json.JSONDecodeError:
+                self.send_json_response({"error": "Invalid JSON payload"}, 400)
+                return
+
+        status, data = TRAINING.handle(method, clean_path, body, dict(self.headers))
+        self.send_json_response(data, status_code=status)
 
 
 def get_llm_response(messages: list, query: str, persona: str, max_tokens: int, temp: float) -> str:
@@ -350,14 +552,31 @@ def generate_detailed_persona_response(query: str, persona: str) -> str:
     )
 
 
-def initialize_llm():
-    """Initialize model and tokenizer pipeline if checkpoint exists."""
+def set_llm_state(state: str, error: Optional[str] = None) -> None:
+    """Thread-safe update of the LLM initialization lifecycle state."""
+    global LLM_STATE, LLM_ERROR
+    with LLM_STATE_LOCK:
+        LLM_STATE = state
+        LLM_ERROR = error
+
+
+def initialize_llm() -> None:
+    """Initialize model and tokenizer pipeline.
+
+    Runs in a background thread so the HTTP server can start immediately and
+    keep the API available while the (potentially large) model loads. Logs
+    before/after each major step so any slow or blocking operation is visible.
+    """
     global PIPELINE
-    logger.info(f"Initializing Netcradus LLM on device: {DEVICE}")
+    set_llm_state("loading")
+    logger.info(f"[init_llm] ENTER initialize_llm (DEVICE={DEVICE})")
 
     try:
+        logger.info("[init_llm] >>> before NetcradusTokenizer()")
         tokenizer = NetcradusTokenizer(vocab_size=32000)
+        logger.info("[init_llm] <<< after  NetcradusTokenizer()")
 
+        logger.info("[init_llm] >>> before NetcradusConfig()")
         config = NetcradusConfig(
             vocab_size=32000,
             hidden_size=256,
@@ -366,22 +585,37 @@ def initialize_llm():
             num_attention_heads=8,
             num_key_value_heads=2
         )
+        logger.info("[init_llm] <<< after  NetcradusConfig()")
+
+        logger.info("[init_llm] >>> before NetcradusForCausalLM()")
         model = NetcradusForCausalLM(config)
+        logger.info("[init_llm] <<< after  NetcradusForCausalLM()")
 
         checkpoint_path = os.path.join(PROJECT_ROOT, "checkpoints_demo", "netcradus_final.pt")
         if os.path.exists(checkpoint_path):
-            logger.info(f"Loading weights from checkpoint: {checkpoint_path}")
+            logger.info("[init_llm] >>> before torch.load()")
+            logger.info(f"[init_llm] Loading weights from checkpoint: {checkpoint_path}")
             checkpoint = torch.load(checkpoint_path, map_location=DEVICE)
+            logger.info("[init_llm] <<< after  torch.load()")
+
+            logger.info("[init_llm] >>> before model.load_state_dict()")
             if isinstance(checkpoint, dict) and "model_state_dict" in checkpoint:
                 model.load_state_dict(checkpoint["model_state_dict"])
             elif isinstance(checkpoint, dict) and "state_dict" in checkpoint:
                 model.load_state_dict(checkpoint["state_dict"])
+            logger.info("[init_llm] <<< after  model.load_state_dict()")
+        else:
+            logger.info(f"[init_llm] No checkpoint found at {checkpoint_path}; skipping weight load")
 
+        logger.info("[init_llm] >>> before NetcradusPipeline()")
         PIPELINE = NetcradusPipeline(model=model, tokenizer=tokenizer, device=DEVICE)
+        logger.info("[init_llm] <<< after  NetcradusPipeline()")
         logger.info("Netcradus Pipeline initialized successfully!")
+        set_llm_state("ready")
 
     except Exception as e:
         logger.warning(f"Could not load full model pipeline ({e}). Running in fallback mode.")
+        set_llm_state("error", str(e))
 
 
 def main():
@@ -390,8 +624,7 @@ def main():
     parser.add_argument("--host", type=str, default="0.0.0.0", help="Host IP address to bind (default: 0.0.0.0)")
     args = parser.parse_args()
 
-    initialize_llm()
-
+    # Start the HTTP server FIRST so the API is available while the LLM loads.
     server_address = (args.host, args.port)
     httpd = ThreadedHTTPServer(server_address, NetcradusHTTPRequestHandler)
 
@@ -399,6 +632,12 @@ def main():
     logger.info("=" * 75)
     logger.info(f"🚀 Netcradus ChatGPT/Gemini Web UI Running at: http://{display_host}:{args.port}")
     logger.info("=" * 75)
+
+    # Load the (potentially large) LLM asynchronously in a background thread so
+    # the model can initialize without blocking request handling. The API falls
+    # back to a rule-based engine until PIPELINE is ready.
+    init_thread = threading.Thread(target=initialize_llm, name="llm-init", daemon=True)
+    init_thread.start()
 
     try:
         httpd.serve_forever()

@@ -23,6 +23,9 @@ ENV/
 .vscode/
 .idea/
 
+# Admin Data (user credentials, settings, logs)
+admin_data/
+
 # OS Specific
 .DS_Store
 Thumbs.db
