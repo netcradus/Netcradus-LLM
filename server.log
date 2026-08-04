@@ -498,3 +498,457 @@ BrokenPipeError: [Errno 32] Broken pipe
 ----------------------------------------
 2026-08-04 09:29:32,398 [INFO] web_server: Query: 'Hello' [Persona: general, Temp: 0.7, MaxTokens: 512]
 2026-08-04 09:29:49,809 [INFO] web_server: 127.0.0.1 - "POST /api/chat HTTP/1.1" 200 -
+2026-08-04 10:59:16,190 [INFO] web_server: ===========================================================================
+2026-08-04 10:59:16,204 [INFO] web_server: 🚀 Netcradus ChatGPT/Gemini Web UI Running at: http://localhost:8000
+2026-08-04 10:59:16,207 [INFO] web_server: ===========================================================================
+2026-08-04 10:59:16,216 [INFO] web_server: [init_llm] ENTER initialize_llm (DEVICE=cpu)
+2026-08-04 10:59:16,220 [INFO] web_server: [init_llm] >>> before NetcradusTokenizer()
+2026-08-04 10:59:16,579 [INFO] web_server: 127.0.0.1 - "GET /api/status HTTP/1.1" 200 -
+2026-08-04 10:59:16,580 [INFO] web_server: [init_llm] <<< after  NetcradusTokenizer()
+2026-08-04 10:59:16,627 [INFO] web_server: [init_llm] >>> before NetcradusConfig()
+2026-08-04 10:59:16,634 [INFO] web_server: [init_llm] <<< after  NetcradusConfig()
+2026-08-04 10:59:16,641 [INFO] web_server: [init_llm] >>> before NetcradusForCausalLM()
+2026-08-04 10:59:16,667 [INFO] web_server: 127.0.0.1 - "GET /api/status HTTP/1.1" 200 -
+2026-08-04 10:59:17,240 [INFO] web_server: [init_llm] <<< after  NetcradusForCausalLM()
+2026-08-04 10:59:17,247 [INFO] web_server: [init_llm] >>> before torch.load()
+2026-08-04 10:59:17,257 [INFO] web_server: [init_llm] Loading weights from checkpoint: /mnt/c/Users/admin/Desktop/LLM/Netcradus-LLM/checkpoints_demo/netcradus_final.pt
+2026-08-04 10:59:19,732 [INFO] web_server: 127.0.0.1 - "GET /api/status HTTP/1.1" 200 -
+2026-08-04 10:59:20,204 [INFO] web_server: [init_llm] <<< after  torch.load()
+2026-08-04 10:59:20,211 [INFO] web_server: [init_llm] >>> before model.load_state_dict()
+2026-08-04 10:59:20,382 [INFO] web_server: [init_llm] <<< after  model.load_state_dict()
+2026-08-04 10:59:20,387 [INFO] web_server: [init_llm] >>> before NetcradusPipeline()
+2026-08-04 10:59:20,392 [INFO] web_server: [init_llm] <<< after  NetcradusPipeline()
+2026-08-04 10:59:20,397 [INFO] web_server: Netcradus Pipeline initialized successfully!
+2026-08-04 11:01:09,335 [INFO] web_server: 127.0.0.1 - "GET /api/status HTTP/1.1" 200 -
+2026-08-04 11:04:13,742 [INFO] web_server: 127.0.0.1 - "GET /api/status HTTP/1.1" 200 -
+2026-08-04 11:04:13,895 [INFO] web_server: 127.0.0.1 - "GET /api/status HTTP/1.1" 200 -
+2026-08-04 11:04:13,910 [INFO] web_server: 127.0.0.1 - "GET / HTTP/1.1" 200 -
+2026-08-04 11:04:13,916 [INFO] web_server: Query: 'Hello' [Persona: general, Temp: 0.5, MaxTokens: 512]
+2026-08-04 11:04:13,917 [INFO] web_server: 127.0.0.1 - code 404, message Page Not Found
+2026-08-04 11:04:13,928 [INFO] web_server: 127.0.0.1 - "GET / HTTP/1.1" 404 -
+----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 41760)
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/mnt/c/Users/admin/Desktop/LLM/Netcradus-LLM/web_server.py", line 260, in do_GET
+    self.send_error(404, "Page Not Found")
+  File "/usr/lib/python3.12/http/server.py", line 491, in send_error
+    self.wfile.write(body)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+2026-08-04 11:04:25,020 [INFO] web_server: 127.0.0.1 - "POST /api/chat HTTP/1.1" 200 -
+2026-08-04 11:04:25,026 [INFO] web_server: Query: 'Hello' [Persona: code, Temp: 0.5, MaxTokens: 512]
+2026-08-04 11:04:38,160 [INFO] web_server: 127.0.0.1 - "POST /api/chat HTTP/1.1" 200 -
+2026-08-04 11:04:38,166 [INFO] web_server: Query: 'Hi there' [Persona: general, Temp: 0.5, MaxTokens: 48]
+2026-08-04 11:04:39,923 [INFO] web_server: 127.0.0.1 - "POST /api/chat/stream HTTP/1.1" 200 -
+2026-08-04 11:04:40,665 [INFO] web_server: 127.0.0.1 - "POST /api/auth/login HTTP/1.1" 200 -
+2026-08-04 11:04:40,671 [INFO] web_server: 127.0.0.1 - "GET /api/auth/me HTTP/1.1" 200 -
+2026-08-04 11:04:40,751 [INFO] web_server: 127.0.0.1 - "POST /api/auth/login HTTP/1.1" 401 -
+2026-08-04 11:04:40,770 [INFO] web_server: 127.0.0.1 - "GET /api/admin/dashboard HTTP/1.1" 200 -
+2026-08-04 11:04:40,779 [INFO] web_server: 127.0.0.1 - "GET /api/admin/users HTTP/1.1" 200 -
+2026-08-04 11:04:40,867 [INFO] web_server: 127.0.0.1 - "POST /api/admin/users HTTP/1.1" 200 -
+2026-08-04 11:04:40,882 [INFO] web_server: 127.0.0.1 - "GET /api/admin/users/testadm_1785841480 HTTP/1.1" 200 -
+2026-08-04 11:04:40,915 [INFO] web_server: 127.0.0.1 - "PUT /api/admin/users/testadm_1785841480 HTTP/1.1" 200 -
+2026-08-04 11:04:41,062 [INFO] web_server: 127.0.0.1 - "POST /api/admin/users/testadm_1785841480/password HTTP/1.1" 200 -
+2026-08-04 11:04:41,092 [INFO] web_server: 127.0.0.1 - "DELETE /api/admin/users/testadm_1785841480 HTTP/1.1" 200 -
+2026-08-04 11:04:41,116 [INFO] web_server: 127.0.0.1 - "GET /api/admin/llm HTTP/1.1" 200 -
+2026-08-04 11:04:42,072 [INFO] web_server: 127.0.0.1 - "POST /api/admin/llm/load HTTP/1.1" 200 -
+2026-08-04 11:04:42,082 [INFO] web_server: 127.0.0.1 - "POST /api/admin/llm/unload HTTP/1.1" 200 -
+2026-08-04 11:04:42,099 [INFO] web_server: 127.0.0.1 - "GET /api/admin/checkpoints HTTP/1.1" 200 -
+2026-08-04 11:04:42,105 [INFO] web_server: 127.0.0.1 - "GET /api/admin/settings HTTP/1.1" 200 -
+2026-08-04 11:04:42,122 [INFO] web_server: 127.0.0.1 - "POST /api/admin/settings HTTP/1.1" 200 -
+2026-08-04 11:04:42,133 [INFO] web_server: 127.0.0.1 - "GET /api/admin/training/status HTTP/1.1" 200 -
+2026-08-04 11:04:42,141 [INFO] web_server: 127.0.0.1 - "POST /api/admin/training/start HTTP/1.1" 200 -
+2026-08-04 11:04:42,160 [INFO] web_server: 127.0.0.1 - "POST /api/admin/training/stop HTTP/1.1" 200 -
+2026-08-04 11:04:42,166 [INFO] web_server: 127.0.0.1 - "GET /api/admin/logs HTTP/1.1" 200 -
+2026-08-04 11:04:42,184 [INFO] web_server: 127.0.0.1 - "DELETE /api/admin/logs HTTP/1.1" 200 -
+2026-08-04 11:04:42,194 [INFO] web_server: 127.0.0.1 - "GET /api/admin/dashboard HTTP/1.1" 401 -
+2026-08-04 11:04:42,536 [INFO] web_server: 127.0.0.1 - "POST /api/user/auth/register HTTP/1.1" 201 -
+2026-08-04 11:04:42,753 [INFO] web_server: 127.0.0.1 - "POST /api/user/auth/login HTTP/1.1" 200 -
+2026-08-04 11:04:42,823 [INFO] web_server: 127.0.0.1 - "GET /api/user/auth/me HTTP/1.1" 200 -
+2026-08-04 11:04:42,962 [INFO] web_server: 127.0.0.1 - "POST /api/user/auth/login HTTP/1.1" 401 -
+2026-08-04 11:04:43,087 [INFO] web_server: 127.0.0.1 - "GET /api/user/dashboard HTTP/1.1" 200 -
+2026-08-04 11:04:43,180 [INFO] web_server: 127.0.0.1 - "GET /api/user/profile HTTP/1.1" 200 -
+2026-08-04 11:04:43,367 [INFO] web_server: 127.0.0.1 - "PUT /api/user/profile HTTP/1.1" 200 -
+2026-08-04 11:04:43,672 [INFO] web_server: 127.0.0.1 - "POST /api/user/change-password HTTP/1.1" 200 -
+2026-08-04 11:04:43,886 [INFO] web_server: 127.0.0.1 - "POST /api/user/auth/login HTTP/1.1" 200 -
+2026-08-04 11:04:44,034 [INFO] web_server: 127.0.0.1 - "POST /api/user/chat-history HTTP/1.1" 200 -
+2026-08-04 11:04:44,080 [INFO] web_server: 127.0.0.1 - "GET /api/user/chat-history HTTP/1.1" 200 -
+2026-08-04 11:04:44,118 [INFO] web_server: 127.0.0.1 - "GET /api/user/chat-history/4 HTTP/1.1" 200 -
+2026-08-04 11:04:44,215 [INFO] web_server: 127.0.0.1 - "DELETE /api/user/chat-history/4 HTTP/1.1" 200 -
+2026-08-04 11:04:44,245 [INFO] web_server: 127.0.0.1 - "POST /api/user/chat HTTP/1.1" 200 -
+2026-08-04 11:04:44,322 [INFO] web_server: 127.0.0.1 - "GET /api/user/settings HTTP/1.1" 200 -
+2026-08-04 11:04:44,425 [INFO] web_server: 127.0.0.1 - "POST /api/user/settings HTTP/1.1" 200 -
+2026-08-04 11:04:44,570 [INFO] web_server: 127.0.0.1 - "POST /api/user/auth/logout HTTP/1.1" 200 -
+2026-08-04 11:04:44,624 [INFO] web_server: 127.0.0.1 - "GET /api/user/dashboard HTTP/1.1" 401 -
+2026-08-04 11:04:44,801 [INFO] web_server: 127.0.0.1 - "GET /api/training/datasets HTTP/1.1" 200 -
+2026-08-04 11:04:44,889 [INFO] web_server: 127.0.0.1 - "POST /api/training/datasets HTTP/1.1" 201 -
+2026-08-04 11:04:44,965 [INFO] web_server: 127.0.0.1 - "GET /api/training/datasets/testdata_1785841482.txt HTTP/1.1" 200 -
+2026-08-04 11:04:45,062 [INFO] web_server: 127.0.0.1 - "POST /api/training/datasets/testdata_1785841482.txt/validate HTTP/1.1" 200 -
+2026-08-04 11:04:45,127 [INFO] web_server: 127.0.0.1 - "DELETE /api/training/datasets/testdata_1785841482.txt HTTP/1.1" 200 -
+2026-08-04 11:04:45,144 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/status HTTP/1.1" 200 -
+2026-08-04 11:04:45,161 [INFO] web_server: 127.0.0.1 - "POST /api/training/train/start HTTP/1.1" 200 -
+2026-08-04 11:04:45,206 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/status HTTP/1.1" 200 -
+2026-08-04 11:04:46,243 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/status HTTP/1.1" 200 -
+2026-08-04 11:04:47,254 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/status HTTP/1.1" 200 -
+[NetcradusTrainer] Starting Training on Device: cpu[NetcradusTrainer] Starting Training on Device: cpu
+
+[NetcradusTrainer] Total Trainable Parameters: 19,204,352[NetcradusTrainer] Total Trainable Parameters: 19,204,352
+
+[NetcradusTrainer] Stop signal received. Halting training loop.
+2026-08-04 11:04:48,298 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/status HTTP/1.1" 200 -
+[NetcradusTrainer] Training Complete! Saved checkpoint to: /tmp/nc_admin_train/netcradus_final.pt
+2026-08-04 11:04:49,334 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/status HTTP/1.1" 200 -
+2026-08-04 11:04:50,378 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/status HTTP/1.1" 200 -
+Step [1/1] | Loss: 10.4109 | Avg Loss: 10.4109 | LR: 0.000030 | Speed: 180.1 tok/s
+2026-08-04 11:04:51,464 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/status HTTP/1.1" 200 -
+[NetcradusTrainer] Training Complete! Saved checkpoint to: /tmp/nc_train_tp/netcradus_final.pt
+2026-08-04 11:04:52,472 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/status HTTP/1.1" 200 -
+2026-08-04 11:04:52,477 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/history HTTP/1.1" 200 -
+2026-08-04 11:04:52,485 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/loss-graph HTTP/1.1" 200 -
+2026-08-04 11:04:52,500 [INFO] web_server: 127.0.0.1 - "GET /api/training/checkpoints HTTP/1.1" 200 -
+2026-08-04 11:04:52,542 [INFO] web_server: 127.0.0.1 - "POST /api/training/checkpoints HTTP/1.1" 200 -
+2026-08-04 11:04:52,576 [INFO] web_server: 127.0.0.1 - "GET /api/training/checkpoints/mytest_ckpt HTTP/1.1" 200 -
+2026-08-04 11:12:38,098 [INFO] web_server: ===========================================================================
+2026-08-04 11:12:38,106 [INFO] web_server: 🚀 Netcradus ChatGPT/Gemini Web UI Running at: http://localhost:8000
+2026-08-04 11:12:38,110 [INFO] web_server: ===========================================================================
+2026-08-04 11:12:38,114 [INFO] web_server: [init_llm] ENTER initialize_llm (DEVICE=cpu)
+2026-08-04 11:12:38,117 [INFO] web_server: [init_llm] >>> before NetcradusTokenizer()
+2026-08-04 11:12:38,336 [INFO] web_server: [init_llm] <<< after  NetcradusTokenizer()
+2026-08-04 11:12:38,340 [INFO] web_server: [init_llm] >>> before NetcradusConfig()
+2026-08-04 11:12:38,344 [INFO] web_server: [init_llm] <<< after  NetcradusConfig()
+2026-08-04 11:12:38,348 [INFO] web_server: [init_llm] >>> before NetcradusForCausalLM()
+2026-08-04 11:12:38,564 [INFO] web_server: 127.0.0.1 - "GET /api/status HTTP/1.1" 200 -
+2026-08-04 11:12:38,701 [INFO] web_server: [init_llm] <<< after  NetcradusForCausalLM()
+2026-08-04 11:12:38,712 [INFO] web_server: [init_llm] >>> before torch.load()
+2026-08-04 11:12:38,716 [INFO] web_server: [init_llm] Loading weights from checkpoint: /mnt/c/Users/admin/Desktop/LLM/Netcradus-LLM/checkpoints_demo/netcradus_final.pt
+2026-08-04 11:12:38,717 [INFO] web_server: 127.0.0.1 - "GET /api/status HTTP/1.1" 200 -
+2026-08-04 11:12:40,772 [INFO] web_server: [init_llm] <<< after  torch.load()
+2026-08-04 11:12:40,776 [INFO] web_server: [init_llm] >>> before model.load_state_dict()
+2026-08-04 11:12:40,809 [INFO] web_server: [init_llm] <<< after  model.load_state_dict()
+2026-08-04 11:12:40,813 [INFO] web_server: [init_llm] >>> before NetcradusPipeline()
+2026-08-04 11:12:40,818 [INFO] web_server: [init_llm] <<< after  NetcradusPipeline()
+2026-08-04 11:12:40,822 [INFO] web_server: Netcradus Pipeline initialized successfully!
+2026-08-04 11:12:40,826 [INFO] web_server: 127.0.0.1 - "GET /api/status HTTP/1.1" 200 -
+2026-08-04 11:16:10,858 [INFO] web_server: ===========================================================================
+2026-08-04 11:16:10,861 [INFO] web_server: 🚀 Netcradus ChatGPT/Gemini Web UI Running at: http://localhost:8000
+2026-08-04 11:16:10,866 [INFO] web_server: ===========================================================================
+2026-08-04 11:16:10,869 [INFO] web_server: [init_llm] ENTER initialize_llm (DEVICE=cpu)
+2026-08-04 11:16:10,879 [INFO] web_server: [init_llm] >>> before NetcradusTokenizer()
+2026-08-04 11:16:11,058 [INFO] web_server: [init_llm] <<< after  NetcradusTokenizer()
+2026-08-04 11:16:11,063 [INFO] web_server: [init_llm] >>> before NetcradusConfig()
+2026-08-04 11:16:11,068 [INFO] web_server: [init_llm] <<< after  NetcradusConfig()
+2026-08-04 11:16:11,071 [INFO] web_server: [init_llm] >>> before NetcradusForCausalLM()
+2026-08-04 11:16:11,353 [INFO] web_server: [init_llm] <<< after  NetcradusForCausalLM()
+2026-08-04 11:16:11,359 [INFO] web_server: [init_llm] >>> before torch.load()
+2026-08-04 11:16:11,360 [INFO] web_server: 127.0.0.1 - "GET /api/status HTTP/1.1" 200 -
+2026-08-04 11:16:11,365 [INFO] web_server: [init_llm] Loading weights from checkpoint: /mnt/c/Users/admin/Desktop/LLM/Netcradus-LLM/checkpoints_demo/netcradus_final.pt
+2026-08-04 11:16:11,424 [INFO] web_server: 127.0.0.1 - "GET /api/status HTTP/1.1" 200 -
+2026-08-04 11:16:11,945 [INFO] web_server: [init_llm] <<< after  torch.load()
+2026-08-04 11:16:11,948 [INFO] web_server: [init_llm] >>> before model.load_state_dict()
+2026-08-04 11:16:11,988 [INFO] web_server: [init_llm] <<< after  model.load_state_dict()
+2026-08-04 11:16:11,996 [INFO] web_server: [init_llm] >>> before NetcradusPipeline()
+2026-08-04 11:16:12,000 [INFO] web_server: [init_llm] <<< after  NetcradusPipeline()
+2026-08-04 11:16:12,004 [INFO] web_server: Netcradus Pipeline initialized successfully!
+2026-08-04 11:16:13,559 [INFO] web_server: 127.0.0.1 - "GET /api/status HTTP/1.1" 200 -
+2026-08-04 11:16:13,834 [INFO] web_server: 127.0.0.1 - "GET /api/status HTTP/1.1" 200 -
+2026-08-04 11:16:13,844 [INFO] web_server: 127.0.0.1 - "GET / HTTP/1.1" 200 -
+2026-08-04 11:16:13,852 [INFO] web_server: 127.0.0.1 - code 404, message Page Not Found
+2026-08-04 11:16:13,852 [INFO] web_server: Query: 'Hello' [Persona: general, Temp: 0.5, MaxTokens: 512]
+2026-08-04 11:16:13,855 [INFO] web_server: 127.0.0.1 - "GET / HTTP/1.1" 404 -
+----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 41956)
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/mnt/c/Users/admin/Desktop/LLM/Netcradus-LLM/web_server.py", line 260, in do_GET
+    self.send_error(404, "Page Not Found")
+  File "/usr/lib/python3.12/http/server.py", line 491, in send_error
+    self.wfile.write(body)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+2026-08-04 11:16:22,756 [INFO] web_server: 127.0.0.1 - "POST /api/chat HTTP/1.1" 200 -
+2026-08-04 11:16:22,762 [INFO] web_server: Query: 'Hello' [Persona: code, Temp: 0.5, MaxTokens: 512]
+2026-08-04 11:16:32,082 [INFO] web_server: 127.0.0.1 - "POST /api/chat HTTP/1.1" 200 -
+2026-08-04 11:16:32,088 [INFO] web_server: Query: 'Hi there' [Persona: general, Temp: 0.5, MaxTokens: 48]
+2026-08-04 11:16:33,420 [INFO] web_server: 127.0.0.1 - "POST /api/chat/stream HTTP/1.1" 200 -
+2026-08-04 11:16:34,098 [INFO] web_server: 127.0.0.1 - "POST /api/auth/login HTTP/1.1" 200 -
+2026-08-04 11:16:34,104 [INFO] web_server: 127.0.0.1 - "GET /api/auth/me HTTP/1.1" 200 -
+2026-08-04 11:16:34,188 [INFO] web_server: 127.0.0.1 - "POST /api/auth/login HTTP/1.1" 401 -
+2026-08-04 11:16:34,209 [INFO] web_server: 127.0.0.1 - "GET /api/admin/dashboard HTTP/1.1" 200 -
+2026-08-04 11:16:34,224 [INFO] web_server: 127.0.0.1 - "GET /api/admin/users HTTP/1.1" 200 -
+2026-08-04 11:16:34,313 [INFO] web_server: 127.0.0.1 - "POST /api/admin/users HTTP/1.1" 200 -
+2026-08-04 11:16:34,323 [INFO] web_server: 127.0.0.1 - "GET /api/admin/users/testadm_1785842194 HTTP/1.1" 200 -
+2026-08-04 11:16:34,352 [INFO] web_server: 127.0.0.1 - "PUT /api/admin/users/testadm_1785842194 HTTP/1.1" 200 -
+2026-08-04 11:16:34,439 [INFO] web_server: 127.0.0.1 - "POST /api/admin/users/testadm_1785842194/password HTTP/1.1" 200 -
+2026-08-04 11:16:34,454 [INFO] web_server: 127.0.0.1 - "DELETE /api/admin/users/testadm_1785842194 HTTP/1.1" 200 -
+2026-08-04 11:16:34,460 [INFO] web_server: 127.0.0.1 - "GET /api/admin/llm HTTP/1.1" 200 -
+2026-08-04 11:16:35,231 [INFO] web_server: 127.0.0.1 - "POST /api/admin/llm/load HTTP/1.1" 200 -
+2026-08-04 11:16:35,242 [INFO] web_server: 127.0.0.1 - "POST /api/admin/llm/unload HTTP/1.1" 200 -
+2026-08-04 11:16:35,266 [INFO] web_server: 127.0.0.1 - "GET /api/admin/checkpoints HTTP/1.1" 200 -
+2026-08-04 11:16:35,272 [INFO] web_server: 127.0.0.1 - "GET /api/admin/settings HTTP/1.1" 200 -
+2026-08-04 11:16:35,290 [INFO] web_server: 127.0.0.1 - "POST /api/admin/settings HTTP/1.1" 200 -
+2026-08-04 11:16:35,297 [INFO] web_server: 127.0.0.1 - "GET /api/admin/training/status HTTP/1.1" 200 -
+2026-08-04 11:16:35,308 [INFO] web_server: 127.0.0.1 - "POST /api/admin/training/start HTTP/1.1" 200 -
+2026-08-04 11:16:35,315 [INFO] web_server: 127.0.0.1 - "POST /api/admin/training/stop HTTP/1.1" 200 -
+2026-08-04 11:16:35,322 [INFO] web_server: 127.0.0.1 - "GET /api/admin/logs HTTP/1.1" 200 -
+2026-08-04 11:16:35,333 [INFO] web_server: 127.0.0.1 - "DELETE /api/admin/logs HTTP/1.1" 200 -
+2026-08-04 11:16:35,339 [INFO] web_server: 127.0.0.1 - "GET /api/admin/dashboard HTTP/1.1" 401 -
+2026-08-04 11:16:35,564 [INFO] web_server: 127.0.0.1 - "POST /api/user/auth/register HTTP/1.1" 201 -
+2026-08-04 11:16:35,686 [INFO] web_server: 127.0.0.1 - "POST /api/user/auth/login HTTP/1.1" 200 -
+2026-08-04 11:16:35,714 [INFO] web_server: 127.0.0.1 - "GET /api/user/auth/me HTTP/1.1" 200 -
+2026-08-04 11:16:35,813 [INFO] web_server: 127.0.0.1 - "POST /api/user/auth/login HTTP/1.1" 401 -
+2026-08-04 11:16:36,012 [INFO] web_server: 127.0.0.1 - "GET /api/user/dashboard HTTP/1.1" 200 -
+2026-08-04 11:16:36,063 [INFO] web_server: 127.0.0.1 - "GET /api/user/profile HTTP/1.1" 200 -
+2026-08-04 11:16:36,149 [INFO] web_server: 127.0.0.1 - "PUT /api/user/profile HTTP/1.1" 200 -
+2026-08-04 11:16:36,517 [INFO] web_server: 127.0.0.1 - "POST /api/user/change-password HTTP/1.1" 200 -
+2026-08-04 11:16:36,693 [INFO] web_server: 127.0.0.1 - "POST /api/user/auth/login HTTP/1.1" 200 -
+2026-08-04 11:16:36,742 [INFO] web_server: 127.0.0.1 - "POST /api/user/chat-history HTTP/1.1" 200 -
+2026-08-04 11:16:36,788 [INFO] web_server: 127.0.0.1 - "GET /api/user/chat-history HTTP/1.1" 200 -
+2026-08-04 11:16:36,854 [INFO] web_server: 127.0.0.1 - "GET /api/user/chat-history/5 HTTP/1.1" 200 -
+2026-08-04 11:16:36,916 [INFO] web_server: 127.0.0.1 - "DELETE /api/user/chat-history/5 HTTP/1.1" 200 -
+2026-08-04 11:16:36,949 [INFO] web_server: 127.0.0.1 - "POST /api/user/chat HTTP/1.1" 200 -
+2026-08-04 11:16:36,998 [INFO] web_server: 127.0.0.1 - "GET /api/user/settings HTTP/1.1" 200 -
+2026-08-04 11:16:37,049 [INFO] web_server: 127.0.0.1 - "POST /api/user/settings HTTP/1.1" 200 -
+2026-08-04 11:16:37,134 [INFO] web_server: 127.0.0.1 - "POST /api/user/auth/logout HTTP/1.1" 200 -
+2026-08-04 11:16:37,167 [INFO] web_server: 127.0.0.1 - "GET /api/user/dashboard HTTP/1.1" 401 -
+2026-08-04 11:16:37,317 [INFO] web_server: 127.0.0.1 - "GET /api/training/datasets HTTP/1.1" 200 -
+2026-08-04 11:16:37,359 [INFO] web_server: 127.0.0.1 - "POST /api/training/datasets HTTP/1.1" 201 -
+2026-08-04 11:16:37,436 [INFO] web_server: 127.0.0.1 - "GET /api/training/datasets/testdata_1785842195.txt HTTP/1.1" 200 -
+2026-08-04 11:16:37,470 [INFO] web_server: 127.0.0.1 - "POST /api/training/datasets/testdata_1785842195.txt/validate HTTP/1.1" 200 -
+2026-08-04 11:16:37,522 [INFO] web_server: 127.0.0.1 - "DELETE /api/training/datasets/testdata_1785842195.txt HTTP/1.1" 200 -
+2026-08-04 11:16:37,546 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/status HTTP/1.1" 200 -
+2026-08-04 11:16:37,574 [INFO] web_server: 127.0.0.1 - "POST /api/training/train/start HTTP/1.1" 200 -
+2026-08-04 11:16:37,602 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/status HTTP/1.1" 200 -
+2026-08-04 11:16:38,610 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/status HTTP/1.1" 200 -
+[NetcradusTrainer] Starting Training on Device: cpu[NetcradusTrainer] Starting Training on Device: cpu
+
+[NetcradusTrainer] Total Trainable Parameters: 19,204,352[NetcradusTrainer] Total Trainable Parameters: 19,204,352
+
+[NetcradusTrainer] Stop signal received. Halting training loop.
+[NetcradusTrainer] Training Complete! Saved checkpoint to: /tmp/nc_admin_train/netcradus_final.pt
+2026-08-04 11:16:39,618 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/status HTTP/1.1" 200 -
+2026-08-04 11:16:40,641 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/status HTTP/1.1" 200 -
+2026-08-04 11:16:41,651 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/status HTTP/1.1" 200 -
+Step [1/1] | Loss: 10.3690 | Avg Loss: 10.3690 | LR: 0.000030 | Speed: 189.5 tok/s
+[NetcradusTrainer] Training Complete! Saved checkpoint to: /tmp/nc_train_tp/netcradus_final.pt
+2026-08-04 11:16:42,664 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/status HTTP/1.1" 200 -
+2026-08-04 11:16:42,671 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/history HTTP/1.1" 200 -
+2026-08-04 11:16:42,677 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/loss-graph HTTP/1.1" 200 -
+2026-08-04 11:16:42,700 [INFO] web_server: 127.0.0.1 - "GET /api/training/checkpoints HTTP/1.1" 200 -
+2026-08-04 11:16:42,716 [INFO] web_server: 127.0.0.1 - "POST /api/training/checkpoints HTTP/1.1" 200 -
+2026-08-04 11:16:42,737 [INFO] web_server: 127.0.0.1 - "GET /api/training/checkpoints/mytest_ckpt HTTP/1.1" 200 -
+2026-08-04 11:32:23,520 [INFO] web_server: ===========================================================================
+2026-08-04 11:32:23,525 [INFO] web_server: 🚀 Netcradus ChatGPT/Gemini Web UI Running at: http://localhost:8000
+2026-08-04 11:32:23,531 [INFO] web_server: ===========================================================================
+2026-08-04 11:32:23,537 [INFO] web_server: [init_llm] ENTER initialize_llm (DEVICE=cpu)
+2026-08-04 11:32:23,546 [INFO] web_server: [init_llm] >>> before NetcradusTokenizer()
+2026-08-04 11:32:23,872 [INFO] web_server: [init_llm] <<< after  NetcradusTokenizer()
+2026-08-04 11:32:23,877 [INFO] web_server: [init_llm] >>> before NetcradusConfig()
+2026-08-04 11:32:23,882 [INFO] web_server: [init_llm] <<< after  NetcradusConfig()
+2026-08-04 11:32:23,886 [INFO] web_server: [init_llm] >>> before NetcradusForCausalLM()
+2026-08-04 11:32:23,977 [INFO] web_server: 127.0.0.1 - "GET /api/status HTTP/1.1" 200 -
+2026-08-04 11:32:24,066 [INFO] web_server: 127.0.0.1 - "GET /api/status HTTP/1.1" 200 -
+2026-08-04 11:32:24,393 [INFO] web_server: [init_llm] <<< after  NetcradusForCausalLM()
+2026-08-04 11:32:24,400 [INFO] web_server: [init_llm] >>> before torch.load()
+2026-08-04 11:32:24,405 [INFO] web_server: [init_llm] Loading weights from checkpoint: /mnt/c/Users/admin/Desktop/LLM/Netcradus-LLM/checkpoints_demo/netcradus_final.pt
+2026-08-04 11:32:26,294 [INFO] web_server: 127.0.0.1 - "GET /api/status HTTP/1.1" 200 -
+2026-08-04 11:32:26,892 [INFO] web_server: [init_llm] <<< after  torch.load()
+2026-08-04 11:32:26,900 [INFO] web_server: [init_llm] >>> before model.load_state_dict()
+2026-08-04 11:32:26,968 [INFO] web_server: [init_llm] <<< after  model.load_state_dict()
+2026-08-04 11:32:26,978 [INFO] web_server: [init_llm] >>> before NetcradusPipeline()
+2026-08-04 11:32:26,986 [INFO] web_server: [init_llm] <<< after  NetcradusPipeline()
+2026-08-04 11:32:26,989 [INFO] web_server: Netcradus Pipeline initialized successfully!
+2026-08-04 11:32:28,436 [INFO] web_server: 127.0.0.1 - "GET /api/status HTTP/1.1" 200 -
+2026-08-04 11:32:28,808 [INFO] web_server: 127.0.0.1 - "GET /api/status HTTP/1.1" 200 -
+2026-08-04 11:36:44,069 [INFO] web_server: 127.0.0.1 - "GET /api/status HTTP/1.1" 200 -
+2026-08-04 11:36:44,102 [INFO] web_server: 127.0.0.1 - "GET / HTTP/1.1" 200 -
+2026-08-04 11:36:44,108 [INFO] web_server: 127.0.0.1 - code 404, message Page Not Found
+2026-08-04 11:36:44,109 [INFO] web_server: Query: 'Hello' [Persona: general, Temp: 0.5, MaxTokens: 512]
+2026-08-04 11:36:44,116 [INFO] web_server: 127.0.0.1 - "GET / HTTP/1.1" 404 -
+----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 42148)
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/mnt/c/Users/admin/Desktop/LLM/Netcradus-LLM/web_server.py", line 260, in do_GET
+    self.send_error(404, "Page Not Found")
+  File "/usr/lib/python3.12/http/server.py", line 491, in send_error
+    self.wfile.write(body)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------
+2026-08-04 11:37:15,302 [INFO] web_server: 127.0.0.1 - "POST /api/chat HTTP/1.1" 200 -
+2026-08-04 11:37:15,310 [INFO] web_server: Query: 'Hello' [Persona: code, Temp: 0.5, MaxTokens: 512]
+2026-08-04 11:37:46,337 [INFO] web_server: 127.0.0.1 - "POST /api/chat HTTP/1.1" 200 -
+2026-08-04 11:37:46,344 [INFO] web_server: Query: 'Hi there' [Persona: general, Temp: 0.5, MaxTokens: 48]
+2026-08-04 11:37:48,869 [INFO] web_server: 127.0.0.1 - "POST /api/chat/stream HTTP/1.1" 200 -
+2026-08-04 11:37:49,707 [INFO] web_server: 127.0.0.1 - "POST /api/auth/login HTTP/1.1" 200 -
+2026-08-04 11:37:49,715 [INFO] web_server: 127.0.0.1 - "GET /api/auth/me HTTP/1.1" 200 -
+2026-08-04 11:37:49,861 [INFO] web_server: 127.0.0.1 - "POST /api/auth/login HTTP/1.1" 401 -
+2026-08-04 11:37:49,902 [INFO] web_server: 127.0.0.1 - "GET /api/admin/dashboard HTTP/1.1" 200 -
+2026-08-04 11:37:49,917 [INFO] web_server: 127.0.0.1 - "GET /api/admin/users HTTP/1.1" 200 -
+2026-08-04 11:37:50,061 [INFO] web_server: 127.0.0.1 - "POST /api/admin/users HTTP/1.1" 200 -
+2026-08-04 11:37:50,073 [INFO] web_server: 127.0.0.1 - "GET /api/admin/users/testadm_1785843469 HTTP/1.1" 200 -
+2026-08-04 11:37:50,099 [INFO] web_server: 127.0.0.1 - "PUT /api/admin/users/testadm_1785843469 HTTP/1.1" 200 -
+2026-08-04 11:37:50,201 [INFO] web_server: 127.0.0.1 - "POST /api/admin/users/testadm_1785843469/password HTTP/1.1" 200 -
+2026-08-04 11:37:50,222 [INFO] web_server: 127.0.0.1 - "DELETE /api/admin/users/testadm_1785843469 HTTP/1.1" 200 -
+2026-08-04 11:37:50,230 [INFO] web_server: 127.0.0.1 - "GET /api/admin/llm HTTP/1.1" 200 -
+2026-08-04 11:37:52,905 [INFO] web_server: 127.0.0.1 - "POST /api/admin/llm/load HTTP/1.1" 200 -
+2026-08-04 11:37:52,943 [INFO] web_server: 127.0.0.1 - "POST /api/admin/llm/unload HTTP/1.1" 200 -
+2026-08-04 11:37:53,008 [INFO] web_server: 127.0.0.1 - "GET /api/admin/checkpoints HTTP/1.1" 200 -
+2026-08-04 11:37:53,020 [INFO] web_server: 127.0.0.1 - "GET /api/admin/settings HTTP/1.1" 200 -
+2026-08-04 11:37:53,040 [INFO] web_server: 127.0.0.1 - "POST /api/admin/settings HTTP/1.1" 200 -
+2026-08-04 11:37:53,053 [INFO] web_server: 127.0.0.1 - "GET /api/admin/training/status HTTP/1.1" 200 -
+2026-08-04 11:37:53,063 [INFO] web_server: 127.0.0.1 - "POST /api/admin/training/start HTTP/1.1" 200 -
+2026-08-04 11:37:53,082 [INFO] web_server: 127.0.0.1 - "POST /api/admin/training/stop HTTP/1.1" 200 -
+2026-08-04 11:37:53,088 [INFO] web_server: 127.0.0.1 - "GET /api/admin/logs HTTP/1.1" 200 -
+2026-08-04 11:37:53,102 [INFO] web_server: 127.0.0.1 - "DELETE /api/admin/logs HTTP/1.1" 200 -
+2026-08-04 11:37:53,129 [INFO] web_server: 127.0.0.1 - "GET /api/admin/dashboard HTTP/1.1" 401 -
+2026-08-04 11:37:53,417 [INFO] web_server: 127.0.0.1 - "POST /api/user/auth/register HTTP/1.1" 201 -
+2026-08-04 11:37:53,557 [INFO] web_server: 127.0.0.1 - "POST /api/user/auth/login HTTP/1.1" 200 -
+2026-08-04 11:37:53,596 [INFO] web_server: 127.0.0.1 - "GET /api/user/auth/me HTTP/1.1" 200 -
+2026-08-04 11:37:53,753 [INFO] web_server: 127.0.0.1 - "POST /api/user/auth/login HTTP/1.1" 401 -
+2026-08-04 11:37:53,834 [INFO] web_server: 127.0.0.1 - "GET /api/user/dashboard HTTP/1.1" 200 -
+2026-08-04 11:37:53,931 [INFO] web_server: 127.0.0.1 - "GET /api/user/profile HTTP/1.1" 200 -
+2026-08-04 11:37:54,073 [INFO] web_server: 127.0.0.1 - "PUT /api/user/profile HTTP/1.1" 200 -
+2026-08-04 11:37:54,378 [INFO] web_server: 127.0.0.1 - "POST /api/user/change-password HTTP/1.1" 200 -
+2026-08-04 11:37:54,600 [INFO] web_server: 127.0.0.1 - "POST /api/user/auth/login HTTP/1.1" 200 -
+2026-08-04 11:37:54,675 [INFO] web_server: 127.0.0.1 - "POST /api/user/chat-history HTTP/1.1" 200 -
+2026-08-04 11:37:54,731 [INFO] web_server: 127.0.0.1 - "GET /api/user/chat-history HTTP/1.1" 200 -
+2026-08-04 11:37:54,783 [INFO] web_server: 127.0.0.1 - "GET /api/user/chat-history/6 HTTP/1.1" 200 -
+2026-08-04 11:37:54,859 [INFO] web_server: 127.0.0.1 - "DELETE /api/user/chat-history/6 HTTP/1.1" 200 -
+2026-08-04 11:37:54,902 [INFO] web_server: 127.0.0.1 - "POST /api/user/chat HTTP/1.1" 200 -
+2026-08-04 11:37:54,985 [INFO] web_server: 127.0.0.1 - "GET /api/user/settings HTTP/1.1" 200 -
+2026-08-04 11:37:55,074 [INFO] web_server: 127.0.0.1 - "POST /api/user/settings HTTP/1.1" 200 -
+2026-08-04 11:37:55,175 [INFO] web_server: 127.0.0.1 - "POST /api/user/auth/logout HTTP/1.1" 200 -
+2026-08-04 11:37:55,226 [INFO] web_server: 127.0.0.1 - "GET /api/user/dashboard HTTP/1.1" 401 -
+2026-08-04 11:37:55,288 [INFO] web_server: 127.0.0.1 - "GET /api/training/datasets HTTP/1.1" 200 -
+2026-08-04 11:37:55,335 [INFO] web_server: 127.0.0.1 - "POST /api/training/datasets HTTP/1.1" 201 -
+2026-08-04 11:37:55,392 [INFO] web_server: 127.0.0.1 - "GET /api/training/datasets/testdata_1785843473.txt HTTP/1.1" 200 -
+2026-08-04 11:37:55,404 [INFO] web_server: 127.0.0.1 - "POST /api/training/datasets/testdata_1785843473.txt/validate HTTP/1.1" 200 -
+2026-08-04 11:37:55,431 [INFO] web_server: 127.0.0.1 - "DELETE /api/training/datasets/testdata_1785843473.txt HTTP/1.1" 200 -
+2026-08-04 11:37:55,451 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/status HTTP/1.1" 200 -
+2026-08-04 11:37:55,469 [INFO] web_server: 127.0.0.1 - "POST /api/training/train/start HTTP/1.1" 200 -
+2026-08-04 11:37:55,523 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/status HTTP/1.1" 200 -
+2026-08-04 11:37:56,555 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/status HTTP/1.1" 200 -
+[NetcradusTrainer] Starting Training on Device: cpu[NetcradusTrainer] Starting Training on Device: cpu
+[NetcradusTrainer] Total Trainable Parameters: 19,204,352
+
+[NetcradusTrainer] Total Trainable Parameters: 19,204,352
+[NetcradusTrainer] Stop signal received. Halting training loop.
+2026-08-04 11:37:57,602 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/status HTTP/1.1" 200 -
+[NetcradusTrainer] Training Complete! Saved checkpoint to: /tmp/nc_admin_train/netcradus_final.pt
+2026-08-04 11:37:58,612 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/status HTTP/1.1" 200 -
+2026-08-04 11:37:59,648 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/status HTTP/1.1" 200 -
+Step [1/1] | Loss: 10.4922 | Avg Loss: 10.4922 | LR: 0.000030 | Speed: 198.5 tok/s
+[NetcradusTrainer] Training Complete! Saved checkpoint to: /tmp/nc_train_tp/netcradus_final.pt
+2026-08-04 11:38:00,663 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/status HTTP/1.1" 200 -
+2026-08-04 11:38:00,671 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/history HTTP/1.1" 200 -
+2026-08-04 11:38:00,677 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/loss-graph HTTP/1.1" 200 -
+2026-08-04 11:38:00,704 [INFO] web_server: 127.0.0.1 - "GET /api/training/checkpoints HTTP/1.1" 200 -
+2026-08-04 11:38:01,663 [INFO] web_server: 127.0.0.1 - "POST /api/admin/llm/load HTTP/1.1" 200 -
+2026-08-04 11:38:01,888 [INFO] web_server: 127.0.0.1 - "POST /api/training/checkpoints HTTP/1.1" 200 -
+2026-08-04 11:38:02,078 [INFO] web_server: 127.0.0.1 - "GET /api/training/checkpoints/mytest_ckpt HTTP/1.1" 200 -
+2026-08-04 11:38:02,646 [INFO] web_server: 127.0.0.1 - "POST /api/training/checkpoints/mytest_ckpt/load HTTP/1.1" 200 -
+2026-08-04 11:38:03,208 [INFO] web_server: 127.0.0.1 - "POST /api/training/checkpoints/mytest_ckpt/export HTTP/1.1" 200 -
+2026-08-04 11:38:03,231 [INFO] web_server: 127.0.0.1 - "DELETE /api/training/checkpoints/mytest_ckpt HTTP/1.1" 200 -
+2026-08-04 11:38:03,240 [INFO] web_server: 127.0.0.1 - "GET /api/training/logs HTTP/1.1" 200 -
+2026-08-04 11:38:03,252 [INFO] web_server: 127.0.0.1 - "POST /api/training/logs HTTP/1.1" 200 -
+2026-08-04 11:38:03,259 [INFO] web_server: 127.0.0.1 - "GET /api/training/logs/errors HTTP/1.1" 200 -
+2026-08-04 11:38:03,266 [INFO] web_server: 127.0.0.1 - "GET /api/training/logs/stats HTTP/1.1" 200 -
+2026-08-04 11:38:03,280 [INFO] web_server: 127.0.0.1 - "DELETE /api/training/logs HTTP/1.1" 200 -
+2026-08-04 11:38:03,330 [INFO] web_server: 127.0.0.1 - "GET /api/status HTTP/1.1" 200 -
+2026-08-04 11:38:58,090 [INFO] web_server: ===========================================================================
+2026-08-04 11:38:58,093 [INFO] web_server: 🚀 Netcradus ChatGPT/Gemini Web UI Running at: http://localhost:8000
+2026-08-04 11:38:58,098 [INFO] web_server: ===========================================================================
+2026-08-04 11:38:58,102 [INFO] web_server: [init_llm] ENTER initialize_llm (DEVICE=cpu)
+2026-08-04 11:38:58,105 [INFO] web_server: [init_llm] >>> before NetcradusTokenizer()
+2026-08-04 11:38:58,378 [INFO] web_server: [init_llm] <<< after  NetcradusTokenizer()
+2026-08-04 11:38:58,382 [INFO] web_server: [init_llm] >>> before NetcradusConfig()
+2026-08-04 11:38:58,385 [INFO] web_server: [init_llm] <<< after  NetcradusConfig()
+2026-08-04 11:38:58,389 [INFO] web_server: [init_llm] >>> before NetcradusForCausalLM()
+2026-08-04 11:38:58,419 [INFO] web_server: 127.0.0.1 - "GET /api/status HTTP/1.1" 200 -
+2026-08-04 11:38:58,482 [INFO] web_server: 127.0.0.1 - "GET /api/status HTTP/1.1" 200 -
+2026-08-04 11:38:58,708 [INFO] web_server: [init_llm] <<< after  NetcradusForCausalLM()
+2026-08-04 11:38:58,713 [INFO] web_server: [init_llm] >>> before torch.load()
+2026-08-04 11:38:58,720 [INFO] web_server: [init_llm] Loading weights from checkpoint: /mnt/c/Users/admin/Desktop/LLM/Netcradus-LLM/checkpoints_demo/netcradus_final.pt
+2026-08-04 11:38:59,165 [INFO] web_server: [init_llm] <<< after  torch.load()
+2026-08-04 11:38:59,170 [INFO] web_server: [init_llm] >>> before model.load_state_dict()
+2026-08-04 11:38:59,209 [INFO] web_server: [init_llm] <<< after  model.load_state_dict()
+2026-08-04 11:38:59,215 [INFO] web_server: [init_llm] >>> before NetcradusPipeline()
+2026-08-04 11:38:59,219 [INFO] web_server: [init_llm] <<< after  NetcradusPipeline()
+2026-08-04 11:38:59,223 [INFO] web_server: Netcradus Pipeline initialized successfully!
+2026-08-04 11:39:00,618 [INFO] web_server: 127.0.0.1 - "GET /api/status HTTP/1.1" 200 -
+2026-08-04 11:39:00,714 [INFO] web_server: Query: 'Hello, Netcradus!' [Persona: general, Temp: 0.5, MaxTokens: 16]
+2026-08-04 11:39:01,054 [INFO] web_server: 127.0.0.1 - "POST /api/chat HTTP/1.1" 200 -
+2026-08-04 11:39:01,155 [INFO] web_server: 127.0.0.1 - "POST /api/auth/login HTTP/1.1" 200 -
+2026-08-04 12:27:22,320 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/status HTTP/1.1" 200 -
+2026-08-04 12:27:23,465 [INFO] web_server: 127.0.0.1 - "GET /api/training/datasets HTTP/1.1" 200 -
+2026-08-04 12:27:29,035 [INFO] web_server: 127.0.0.1 - "GET /api/training/checkpoints HTTP/1.1" 200 -
+2026-08-04 12:27:31,296 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/status HTTP/1.1" 200 -
+2026-08-04 12:27:33,332 [INFO] web_server: 127.0.0.1 - "GET /api/training/datasets HTTP/1.1" 200 -
+2026-08-04 12:27:34,547 [INFO] web_server: 127.0.0.1 - "GET /api/training/logs?limit=500 HTTP/1.1" 200 -
+2026-08-04 12:27:37,898 [INFO] web_server: 127.0.0.1 - "GET /api/training/logs?limit=500 HTTP/1.1" 200 -
+2026-08-04 12:27:40,923 [INFO] web_server: 127.0.0.1 - "GET /api/training/logs?limit=500 HTTP/1.1" 200 -
+2026-08-04 12:27:44,275 [INFO] web_server: 127.0.0.1 - "GET /api/training/logs?limit=500 HTTP/1.1" 200 -
+2026-08-04 12:27:45,942 [INFO] web_server: 127.0.0.1 - "GET /api/training/datasets HTTP/1.1" 200 -
+2026-08-04 12:27:50,165 [INFO] web_server: 127.0.0.1 - "DELETE /api/training/datasets/cleaned_corpus.txt HTTP/1.1" 200 -
+2026-08-04 12:27:50,439 [INFO] web_server: 127.0.0.1 - "GET /api/training/datasets HTTP/1.1" 200 -
+2026-08-04 12:27:52,954 [INFO] web_server: 127.0.0.1 - "DELETE /api/training/datasets/training_data.txt HTTP/1.1" 200 -
+2026-08-04 12:27:53,298 [INFO] web_server: 127.0.0.1 - "GET /api/training/datasets HTTP/1.1" 200 -
+2026-08-04 12:28:38,432 [INFO] web_server: 127.0.0.1 - "GET /api/status HTTP/1.1" 200 -
+2026-08-04 12:28:38,451 [INFO] web_server: 127.0.0.1 - "GET / HTTP/1.1" 200 -
+2026-08-04 12:28:38,459 [INFO] web_server: 127.0.0.1 - code 404, message Page Not Found
+2026-08-04 12:28:38,463 [INFO] web_server: 127.0.0.1 - "GET / HTTP/1.1" 404 -
+----------------------------------------
+Exception occurred during processing of request from ('127.0.0.1', 42390)
+Traceback (most recent call last):
+  File "/usr/lib/python3.12/socketserver.py", line 692, in process_request_thread
+    self.finish_request(request, client_address)
+  File "/usr/lib/python3.12/socketserver.py", line 362, in finish_request
+    self.RequestHandlerClass(request, client_address, self)
+  File "/usr/lib/python3.12/socketserver.py", line 761, in __init__
+    self.handle()
+  File "/usr/lib/python3.12/http/server.py", line 436, in handle
+    self.handle_one_request()
+  File "/usr/lib/python3.12/http/server.py", line 424, in handle_one_request
+    method()
+  File "/mnt/c/Users/admin/Desktop/LLM/Netcradus-LLM/web_server.py", line 260, in do_GET
+    self.send_error(404, "Page Not Found")
+  File "/usr/lib/python3.12/http/server.py", line 491, in send_error
+    self.wfile.write(body)
+  File "/usr/lib/python3.12/socketserver.py", line 840, in write
+    self._sock.sendall(b)
+BrokenPipeError: [Errno 32] Broken pipe
+----------------------------------------

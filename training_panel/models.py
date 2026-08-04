@@ -65,6 +65,11 @@ class CheckpointManager:
                     checkpoint_data["config"] = PIPELINE.model.config.to_dict()
                     checkpoint_data["model_state_dict"] = PIPELINE.model.state_dict()
                     checkpoint_data["vocab_size"] = PIPELINE.tokenizer.vocab_size
+                else:
+                    # No live model to snapshot: embed the runtime config so the
+                    # saved checkpoint is loadable (state_dict stays empty).
+                    from netcradus_llm.config import RUNTIME_CONFIG
+                    checkpoint_data["config"] = RUNTIME_CONFIG.to_dict()
             except Exception:
                 pass
 
@@ -91,7 +96,7 @@ class CheckpointManager:
 
         try:
             import torch
-            from netcradus_llm.config import NetcradusConfig
+            from netcradus_llm.config import NetcradusConfig, RUNTIME_CONFIG
             from netcradus_llm.model import NetcradusForCausalLM
             from netcradus_llm.tokenizer import NetcradusTokenizer
             from netcradus_llm.inference import NetcradusPipeline
@@ -102,7 +107,9 @@ class CheckpointManager:
             if config_dict:
                 config = NetcradusConfig.from_dict(config_dict)
             else:
-                config = NetcradusConfig(vocab_size=32000)
+                # No config in checkpoint: fall back to the small runtime config
+                # (NOT the multi-GB architectural defaults, which would OOM).
+                config = NetcradusConfig(**RUNTIME_CONFIG.to_dict())
             model = NetcradusForCausalLM(config)
             if isinstance(checkpoint, dict):
                 if "model_state_dict" in checkpoint:

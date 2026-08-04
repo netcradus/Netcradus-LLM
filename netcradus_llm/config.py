@@ -71,3 +71,20 @@ PROTOTYPE_CONFIG = NetcradusConfig(
     rope_theta=10000.0,
     rope_scaling=None
 )
+
+# Runtime / Demo configuration used by the serving backend (web_server.py
+# initialize_llm) and the training managers. This is the *small* 19M-param
+# architecture actually loaded at runtime. It is used as the safe fallback
+# when loading a checkpoint that carries no config, so we never accidentally
+# instantiate the (multi-GB) architectural defaults which would OOM the host.
+RUNTIME_CONFIG = NetcradusConfig(
+    vocab_size=32000,
+    hidden_size=256,
+    intermediate_size=704,
+    num_hidden_layers=4,
+    num_attention_heads=8,
+    num_key_value_heads=2,
+    max_position_embeddings=2048,
+    rope_theta=10000.0,
+    rope_scaling=None
+)

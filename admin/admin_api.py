@@ -358,7 +358,8 @@ class AdminAPI:
             return 404, {"error": f"Checkpoint '{name}' not found"}
         try:
             import torch
-            from netcradus_llm.config import NetcradusConfig
+
+            from netcradus_llm.config import NetcradusConfig, RUNTIME_CONFIG
             from netcradus_llm.model import NetcradusForCausalLM
             from netcradus_llm.tokenizer import NetcradusTokenizer
             from netcradus_llm.inference import NetcradusPipeline
@@ -368,7 +369,9 @@ class AdminAPI:
             if config_dict:
                 config = NetcradusConfig.from_dict(config_dict)
             else:
-                config = NetcradusConfig(vocab_size=32000)
+                # No config in checkpoint: fall back to the small runtime config
+                # (NOT the multi-GB architectural defaults, which would OOM).
+                config = NetcradusConfig(**RUNTIME_CONFIG.to_dict())
             model = NetcradusForCausalLM(config)
             if isinstance(checkpoint, dict):
                 if "model_state_dict" in checkpoint:
