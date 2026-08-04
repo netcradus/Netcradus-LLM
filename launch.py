@@ -25,6 +25,7 @@ import argparse
 import os
 import subprocess
 import sys
+import threading
 import time
 import urllib.error
 import urllib.request
@@ -93,9 +94,22 @@ def wait_until_ready(port: int) -> bool:
 
 
 def open_browser(port: int) -> None:
+    """Open the app in the default browser.
+
+    Runs in a daemon thread so the launcher returns immediately (and never
+    blocks on a headless machine where no browser is available).
+    """
     url = f"http://localhost:{port}/"
     print(f"[launcher] Opening {url}")
-    webbrowser.open(url, new=2)
+
+    def _open_blocking() -> None:
+        try:
+            webbrowser.open(url, new=2)
+        except Exception as exc:  # noqa: BLE001 - browser launch must never block the launcher
+            print(f"[launcher] Could not open browser automatically ({exc}).")
+            print(f"[launcher] Please open {url} manually in your browser.")
+
+    threading.Thread(target=_open_blocking, name="open-browser", daemon=True).start()
 
 
 def main() -> int:
