@@ -498,3 +498,13 @@ BrokenPipeError: [Errno 32] Broken pipe
 ----------------------------------------
 2026-08-04 09:29:32,398 [INFO] web_server: Query: 'Hello' [Persona: general, Temp: 0.7, MaxTokens: 512]
 2026-08-04 09:29:49,809 [INFO] web_server: 127.0.0.1 - "POST /api/chat HTTP/1.1" 200 -
+2026-08-05 10:02:30,621 [INFO] web_server: ===========================================================================
+2026-08-05 10:02:30,621 [INFO] web_server: \U0001f680 Netcradus ChatGPT/Gemini Web UI Running at: http://localhost:8000
+2026-08-05 10:02:30,621 [INFO] web_server: ===========================================================================
+2026-08-05 10:02:30,636 [INFO] web_server: [init_llm] ENTER initialize_llm (DEVICE=cpu)
+2026-08-05 10:02:30,636 [INFO] web_server: [init_llm] >>> before NetcradusTokenizer()
+2026-08-05 10:02:30,809 [INFO] web_server: [init_llm] <<< after  NetcradusTokenizer()
+2026-08-05 10:02:30,809 [INFO] web_server: [init_llm] >>> before NetcradusConfig()
+2026-08-05 10:02:30,809 [INFO] web_server: [init_llm] <<< after  NetcradusConfig()
+2026-08-05 10:02:30,809 [INFO] web_server: [init_llm] >>> before NetcradusForCausalLM()
+2026-08-05 10:02:30,841 [INFO] web_server: 127.0.0.1 - "GET /api/status HTTP/1.1" 200 -
