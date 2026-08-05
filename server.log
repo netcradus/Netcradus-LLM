@@ -1064,3 +1064,9 @@ BrokenPipeError: [Errno 32] Broken pipe
 2026-08-04 12:42:03,760 [INFO] web_server: 127.0.0.1 - "POST /api/user/auth/register HTTP/1.1" 201 -
 2026-08-04 12:42:04,103 [INFO] web_server: 127.0.0.1 - "GET /api/user/dashboard HTTP/1.1" 200 -
 2026-08-04 12:42:15,417 [INFO] web_server: 127.0.0.1 - "POST /api/user/auth/logout HTTP/1.1" 200 -
+2026-08-04 13:11:45,449 [INFO] web_server: 127.0.0.1 - "DELETE /api/training/datasets/training_data.txt HTTP/1.1" 400 -
+2026-08-04 13:13:52,757 [INFO] web_server: 127.0.0.1 - "DELETE /api/training/datasets/training_data.txt HTTP/1.1" 400 -
+2026-08-04 13:14:11,116 [INFO] web_server: 127.0.0.1 - "GET /api/training/train/status HTTP/1.1" 200 -
+2026-08-04 13:14:23,899 [INFO] web_server: 127.0.0.1 - "GET /api/training/checkpoints HTTP/1.1" 200 -
+2026-08-04 13:14:29,328 [INFO] web_server: 127.0.0.1 - "GET /api/training/logs?limit=500 HTTP/1.1" 200 -
+2026-08-04 13:14:32,679 [INFO] web_server: 127.0.0.1 - "GET /api/training/logs?limit=500 HTTP/1.1" 200 -
