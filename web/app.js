@@ -10,7 +10,7 @@
  * - Markdown & Collapsible Thought Process (<details class='reasoning-block'>) parser.
  * - Light & Dark Theme Switcher with localStorage persistence.
  */
-
+import { auth } from "./firebase-config.js";
 document.addEventListener('DOMContentLoaded', () => {
   // DOM Elements - Main Layout & Navigation
   const appContainer = document.getElementById('app-container');
@@ -351,23 +351,6 @@ document.addEventListener('DOMContentLoaded', () => {
       renderCurrentSessionMessages();
       renderHistoryList();
       if (profileMenuDropdown) profileMenuDropdown.style.display = 'none';
-    }
-  }
-
-  function handleLogout() {
-    if (confirm('Are you sure you want to log out?')) {
-      if (isGenerating) stopGeneration();
-      localStorage.removeItem('netcradus_user');
-      localStorage.removeItem('netcradus_sessions');
-      sessions = {};
-      currentSessionId = createNewSession();
-      clearAttachment();
-      renderCurrentSessionMessages();
-      renderHistoryList();
-      if (profileMenuDropdown) profileMenuDropdown.style.display = 'none';
-      if (settingsModalBackdrop) settingsModalBackdrop.style.display = 'none';
-      initDefaultUserProfileUI();
-      alert('You have been logged out successfully.');
     }
   }
 
@@ -772,7 +755,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function attachCopyCodeListeners(container) {
     const copyBtns = container.querySelectorAll('.btn-copy-code');
     copyBtns.forEach(btn => {
-      btn.onclick = function() {
+      btn.onclick = function () {
         const preElem = btn.closest('.code-wrapper').querySelector('code');
         if (preElem) {
           navigator.clipboard.writeText(preElem.innerText).then(() => {
@@ -813,8 +796,7 @@ document.addEventListener('DOMContentLoaded', () => {
   if (btnClearChat) btnClearChat.addEventListener('click', clearCurrentSession);
   if (btnSidebarClearHistory) btnSidebarClearHistory.addEventListener('click', clearAllHistory);
   if (btnMenuClearHistory) btnMenuClearHistory.addEventListener('click', clearAllHistory);
-  if (btnMenuLogout) btnMenuLogout.addEventListener('click', handleLogout);
-  if (btnModalLogout) btnModalLogout.addEventListener('click', handleLogout);
+
 
   // Settings Modal Controls
   if (btnSettings && settingsModalBackdrop) {
