@@ -51,13 +51,13 @@
   // Theme
   // ---------------------------------------------------------------------------
   function initTheme() {
-    const saved = localStorage.getItem("netcradus_theme") || "dark";
+    const saved = localStorage.getItem("netcradus_theme") || "light";
     document.documentElement.setAttribute("data-theme", saved);
     updateThemeIcon(saved);
   }
 
   function toggleTheme() {
-    const current = document.documentElement.getAttribute("data-theme") || "dark";
+    const current = document.documentElement.getAttribute("data-theme") || "light";
     const next = current === "dark" ? "light" : "dark";
     document.documentElement.setAttribute("data-theme", next);
     localStorage.setItem("netcradus_theme", next);
@@ -487,7 +487,7 @@
           </div>
           <div class="form-group">
             <label>Avatar Color</label>
-            <input type="color" id="prof-avatar-color" value="${profile.avatar_color || '#8b5cf6'}">
+            <input type="color" id="prof-avatar-color" value="${profile.avatar_color || '#f97316'}">
           </div>
           <div class="form-actions">
             <button class="btn btn-primary" id="btn-save-profile">Save Profile</button>

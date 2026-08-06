@@ -96,10 +96,13 @@ body {
 }
 
 .brand-official-logo {
-  height: 160px;
+  height: 36px;
   width: auto;
   object-fit: contain;
-  mix-blend-mode: multiply;
+  background: #ffffff;
+  padding: 4px 12px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .btn-icon-toggle {
