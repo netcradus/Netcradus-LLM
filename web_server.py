@@ -197,7 +197,7 @@ class NetcradusHTTPRequestHandler(BaseHTTPRequestHandler):
             status_data = {
                 "status": "online",
                 "model_name": "Netcradus LLM v1.0",
-                "vocab_size": PIPELINE.tokenizer.vocab_size if PIPELINE else 32000,
+                "vocab_size": PIPELINE.tokenizer.vocab_size if PIPELINE else 128000,
                 "device": DEVICE,
                 "architecture": "SwiGLU + GQA + RoPE (256k context)",
                 "model_loaded": PIPELINE is not None,
@@ -573,12 +573,12 @@ def initialize_llm() -> None:
 
     try:
         logger.info("[init_llm] >>> before NetcradusTokenizer()")
-        tokenizer = NetcradusTokenizer(vocab_size=32000)
+        tokenizer = NetcradusTokenizer(vocab_size=128000)
         logger.info("[init_llm] <<< after  NetcradusTokenizer()")
 
         logger.info("[init_llm] >>> before NetcradusConfig()")
         config = NetcradusConfig(
-            vocab_size=32000,
+            vocab_size=128000,
             hidden_size=256,
             intermediate_size=704,
             num_hidden_layers=4,

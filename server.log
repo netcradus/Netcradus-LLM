@@ -518,3 +518,36 @@ BrokenPipeError: [Errno 32] Broken pipe
 2026-08-05 12:09:21,243 [INFO] web_server: [init_llm] >>> before NetcradusConfig()
 2026-08-05 12:09:21,243 [INFO] web_server: [init_llm] <<< after  NetcradusConfig()
 2026-08-05 12:09:21,244 [INFO] web_server: [init_llm] >>> before NetcradusForCausalLM()
+2026-08-06 15:54:33,813 [INFO] web_server: ===========================================================================
+2026-08-06 15:54:33,815 [INFO] web_server: \U0001f680 Netcradus ChatGPT/Gemini Web UI Running at: http://localhost:8000
+2026-08-06 15:54:33,815 [INFO] web_server: ===========================================================================
+2026-08-06 15:54:33,815 [INFO] web_server: [init_llm] ENTER initialize_llm (DEVICE=cpu)
+2026-08-06 15:54:33,815 [INFO] web_server: [init_llm] >>> before NetcradusTokenizer()
+2026-08-06 15:54:34,035 [INFO] web_server: [init_llm] <<< after  NetcradusTokenizer()
+2026-08-06 15:54:34,035 [INFO] web_server: [init_llm] >>> before NetcradusConfig()
+2026-08-06 15:54:34,035 [INFO] web_server: [init_llm] <<< after  NetcradusConfig()
+2026-08-06 15:54:34,035 [INFO] web_server: [init_llm] >>> before NetcradusForCausalLM()
+2026-08-06 15:54:34,113 [INFO] web_server: 127.0.0.1 - "GET /api/status HTTP/1.1" 200 -
+2026-08-06 17:14:32,524 [INFO] web_server: ===========================================================================
+2026-08-06 17:14:32,524 [INFO] web_server: \U0001f680 Netcradus ChatGPT/Gemini Web UI Running at: http://localhost:8000
+2026-08-06 17:14:32,524 [INFO] web_server: ===========================================================================
+2026-08-06 17:14:32,524 [INFO] web_server: [init_llm] ENTER initialize_llm (DEVICE=cpu)
+2026-08-06 17:14:32,540 [INFO] web_server: [init_llm] >>> before NetcradusTokenizer()
+2026-08-06 17:14:32,724 [INFO] web_server: [init_llm] <<< after  NetcradusTokenizer()
+2026-08-06 17:14:32,724 [INFO] web_server: [init_llm] >>> before NetcradusConfig()
+2026-08-06 17:14:32,724 [INFO] web_server: [init_llm] <<< after  NetcradusConfig()
+2026-08-06 17:14:32,739 [INFO] web_server: [init_llm] >>> before NetcradusForCausalLM()
+2026-08-06 17:14:33,108 [INFO] web_server: [init_llm] <<< after  NetcradusForCausalLM()
+2026-08-06 17:14:33,108 [INFO] web_server: [init_llm] >>> before torch.load()
+2026-08-06 17:14:33,108 [INFO] web_server: [init_llm] Loading weights from checkpoint: C:\Users\pc\Desktop\netcradus llm\Netcradus-LLM\checkpoints_demo\netcradus_final.pt
+2026-08-06 17:14:35,551 [INFO] web_server: 127.0.0.1 - "GET /api/status HTTP/1.1" 200 -
+2026-08-06 17:17:20,868 [INFO] web_server: ===========================================================================
+2026-08-06 17:17:20,868 [INFO] web_server: \U0001f680 Netcradus ChatGPT/Gemini Web UI Running at: http://localhost:8000
+2026-08-06 17:17:20,868 [INFO] web_server: ===========================================================================
+2026-08-06 17:17:20,868 [INFO] web_server: [init_llm] ENTER initialize_llm (DEVICE=cpu)
+2026-08-06 17:17:20,868 [INFO] web_server: [init_llm] >>> before NetcradusTokenizer()
+2026-08-06 17:17:20,978 [INFO] web_server: 127.0.0.1 - "GET /api/status HTTP/1.1" 200 -
+2026-08-06 17:17:21,024 [INFO] web_server: [init_llm] <<< after  NetcradusTokenizer()
+2026-08-06 17:17:21,024 [INFO] web_server: [init_llm] >>> before NetcradusConfig()
+2026-08-06 17:17:21,024 [INFO] web_server: [init_llm] <<< after  NetcradusConfig()
+2026-08-06 17:17:21,024 [INFO] web_server: [init_llm] >>> before NetcradusForCausalLM()

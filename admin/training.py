@@ -165,6 +165,14 @@ class TrainingJobManager:
                     else f"Training finished. Checkpoint saved to {output_dir}/netcradus_final.pt"
                 )
                 self._finished_at = time.time()
+                # Release the heavy model + optimizer now that training is done so
+                # memory is reclaimed before the next job (prevents OOM across jobs).
+                try:
+                    trainer.model = None
+                    trainer.optimizer = None
+                    trainer.train_dataloader = None
+                except Exception:
+                    pass
         except Exception as exc:
             with self._lock:
                 self._state = "error"
