@@ -1,4 +1,9 @@
-import { auth, googleProvider } from "./firebase-config.js";
+import { auth, db, googleProvider } from "./firebase-config.js";
+import {
+    doc,
+    setDoc,
+    getDoc
+} from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
 import {
     signInWithEmailAndPassword,
@@ -102,13 +107,46 @@ loginForm.addEventListener("submit", async (e) => {
         const password =
             document.getElementById("loginPassword").value;
 
-        await signInWithEmailAndPassword(
-            auth,
-            email,
-            password
-        );
+        const result =
+            await signInWithEmailAndPassword(
+                auth,
+                email,
+                password
+            );
+        if (!result.user.emailVerified) {
 
-        window.location.href = "index.html";
+            showMessage("Please verify your email before logging in.");
+
+            return;
+
+        }
+        const userDoc = await getDoc(doc(db, "users", result.user.uid));
+
+        if (!userDoc.exists()) {
+
+            showMessage("User profile not found.");
+
+            return;
+
+        }
+
+        const role = userDoc.data().role;
+
+        if (role === "admin") {
+
+            window.location.href = "admin.html";
+
+        }
+        else if (role === "trainer") {
+
+            window.location.href = "training.html";
+
+        }
+        else {
+
+            window.location.href = "index.html";
+
+        }
 
     } catch (err) {
 
@@ -142,11 +180,22 @@ signupForm.addEventListener("submit", async (e) => {
                 password
             );
 
+
         await updateProfile(result.user, {
 
             displayName: name
 
         });
+
+        await setDoc(
+            doc(db, "users", result.user.uid),
+
+            {
+                name: name,
+                email: email,
+                role: "user"
+            }
+        );
 
         await sendEmailVerification(result.user);
 
@@ -219,13 +268,44 @@ googleBtn.onclick = async () => {
 };
 
 /* ---------------- Already Logged In ---------------- */
+/*onAuthStateChanged(auth, async (user) => {
 
-onAuthStateChanged(auth, (user) => {
+    if (!user) return;
 
-    if (user) {
+    try {
 
-        window.location.href = "index.html";
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+
+        if (!userDoc.exists()) {
+            return;
+        }
+
+        const role = userDoc.data().role;
+
+        if (role === "admin") {
+
+            window.location.href = "admin.html";
+
+        }
+        else if (role === "trainer") {
+
+            window.location.href = "training.html";
+
+        }
+        else {
+
+            window.location.href = "user.html";
+
+      }
+
+    } catch (error) {
+
+        console.error(error);
 
     }
 
-});
+});*/
+
+
+
+
