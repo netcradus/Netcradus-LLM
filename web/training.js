@@ -36,13 +36,13 @@
   // Theme
   // ---------------------------------------------------------------------------
   function initTheme() {
-    const saved = localStorage.getItem("netcradus_theme") || "dark";
+    const saved = localStorage.getItem("netcradus_theme") || "light";
     document.documentElement.setAttribute("data-theme", saved);
     updateThemeIcon(saved);
   }
 
   function toggleTheme() {
-    const current = document.documentElement.getAttribute("data-theme") || "dark";
+    const current = document.documentElement.getAttribute("data-theme") || "light";
     const next = current === "dark" ? "light" : "dark";
     document.documentElement.setAttribute("data-theme", next);
     localStorage.setItem("netcradus_theme", next);
@@ -438,7 +438,7 @@
     const range = maxLoss - minLoss || 1;
 
     // Grid lines
-    ctx.strokeStyle = "rgba(139, 92, 246, 0.1)";
+    ctx.strokeStyle = "rgba(249, 115, 22, 0.15)";
     ctx.lineWidth = 1;
     for (let i = 0; i <= 4; i++) {
       const y = pad + (plotH / 4) * i;
@@ -449,7 +449,7 @@
     }
 
     // Loss line
-    ctx.strokeStyle = "#8b5cf6";
+    ctx.strokeStyle = "#f97316";
     ctx.lineWidth = 2;
     ctx.beginPath();
     data.forEach((loss, i) => {

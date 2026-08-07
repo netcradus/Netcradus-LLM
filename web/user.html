@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Netcradus Admin Dashboard</title>
+<title>Netcradus User Panel</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="admin.css">
+<link rel="stylesheet" href="user.css">
 </head>
 <body>
 
@@ -16,13 +16,13 @@
   <div class="login-card">
     <div class="login-brand">
       <img src="image/logo.png" class="login-official-logo" alt="NETCRADUS™ Logo">
-      <h1>Admin Dashboard</h1>
-      <p>Sign in to manage your LLM</p>
+      <h1>User Portal</h1>
+      <p>Sign in to your account</p>
     </div>
     <form id="login-form" class="login-form" autocomplete="off">
       <div class="form-group">
         <label for="login-username">Username</label>
-        <input id="login-username" type="text" placeholder="admin" required autofocus>
+        <input id="login-username" type="text" placeholder="your username" required autofocus>
       </div>
       <div class="form-group">
         <label for="login-password">Password</label>
@@ -31,51 +31,75 @@
       <div id="login-error" class="login-error" style="display:none;"></div>
       <button type="submit" class="btn btn-primary btn-full">Sign In</button>
     </form>
-    <p class="login-footer">Default credentials are set on first run. Change password after login.</p>
+    <p class="login-footer">
+      Don't have an account? <a href="#" id="link-register">Create one</a>
+    </p>
   </div>
 </div>
 
-<!-- ========== ADMIN APP VIEW ========== -->
-<div id="app-view" class="admin-layout" style="display:none;">
+<!-- ========== REGISTER VIEW ========== -->
+<div id="register-view" class="login-view" style="display:none;">
+  <div class="login-card">
+    <div class="login-brand">
+      <img src="image/logo.png" class="login-official-logo" alt="NETCRADUS™ Logo">
+      <h1>Create Account</h1>
+      <p>Join the Netcradus community</p>
+    </div>
+    <form id="register-form" class="login-form" autocomplete="off">
+      <div class="form-group">
+        <label for="reg-username">Username</label>
+        <input id="reg-username" type="text" placeholder="your username" required autofocus>
+      </div>
+      <div class="form-group">
+        <label for="reg-displayname">Display Name</label>
+        <input id="reg-displayname" type="text" placeholder="Your name">
+      </div>
+      <div class="form-group">
+        <label for="reg-password">Password</label>
+        <input id="reg-password" type="password" placeholder="Min 6 characters" required>
+      </div>
+      <div id="register-error" class="login-error" style="display:none;"></div>
+      <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+    </form>
+    <p class="login-footer">
+      Already have an account? <a href="#" id="link-login">Sign in</a>
+    </p>
+  </div>
+</div>
+
+<!-- ========== USER APP VIEW ========== -->
+<div id="app-view" class="user-layout" style="display:none;">
 
   <!-- Sidebar -->
-  <aside class="admin-sidebar" id="admin-sidebar">
+  <aside class="user-sidebar" id="user-sidebar">
     <div class="sidebar-brand">
       <img src="image/logo.png" class="official-brand-logo" alt="NETCRADUS™ Logo">
-      <span class="brand-text">Admin</span>
+      <span class="brand-text">User Panel</span>
     </div>
     <nav class="sidebar-nav">
       <a href="#dashboard" class="nav-item active" data-section="dashboard">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
         Dashboard
       </a>
-      <a href="#users" class="nav-item" data-section="users">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        Users
+      <a href="#chat" class="nav-item" data-section="chat">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Chat
       </a>
-      <a href="#llm" class="nav-item" data-section="llm">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
-        LLM Management
+      <a href="#profile" class="nav-item" data-section="profile">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Profile
       </a>
       <a href="#settings" class="nav-item" data-section="settings">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06A1.65 1.65 0 0 0 15 4.6a1.65 1.65 0 0 0-1-1.51V3a2 2 0 0 0-2 2z"/></svg>
-        Model Settings
-      </a>
-      <a href="#training" class="nav-item" data-section="training">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-        Training
-      </a>
-      <a href="#logs" class="nav-item" data-section="logs">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-        Logs
+        Settings
       </a>
     </nav>
     <div class="sidebar-footer">
       <div class="sidebar-user">
-        <div class="user-avatar" id="sidebar-user-avatar">A</div>
+        <div class="user-avatar" id="sidebar-user-avatar">U</div>
         <div class="user-info">
-          <span class="user-name" id="sidebar-username">Admin</span>
-          <span class="user-role" id="sidebar-role">Administrator</span>
+          <span class="user-name" id="sidebar-username">User</span>
+          <span class="user-role" id="sidebar-role">Member</span>
         </div>
       </div>
       <button class="btn btn-ghost btn-full" id="btn-logout">Log Out</button>
@@ -83,8 +107,8 @@
   </aside>
 
   <!-- Main area -->
-  <div class="admin-main">
-    <header class="admin-topbar">
+  <div class="user-main">
+    <header class="user-topbar">
       <button class="btn-icon hamburger" id="btn-hamburger" title="Toggle menu">
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
       </button>
@@ -93,12 +117,12 @@
         <button class="btn-icon" id="btn-theme-toggle" title="Toggle theme">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" id="theme-icon"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         </button>
-        <span class="status-dot" id="status-dot" title="System status"></span>
+        <span class="status-dot" id="status-dot"></span>
         <span class="status-text" id="status-text">Online</span>
       </div>
     </header>
 
-    <main class="admin-content" id="admin-content">
+    <main class="user-content" id="user-content">
       <!-- Sections injected by JS -->
     </main>
   </div>
@@ -107,6 +131,6 @@
 <!-- Toast container -->
 <div id="toast-container" class="toast-container"></div>
 
-<script src="admin.js"></script>
+<script src="user.js"></script>
 </body>
 </html>
